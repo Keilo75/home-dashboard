@@ -16,18 +16,20 @@ import React from 'react';
 
 interface FileListHeaderProps {
   path: string[];
+  setPath: React.Dispatch<React.SetStateAction<string[]>>;
   files: IFile[];
   filesHandler: UseListStateHandler<IFile>;
 }
 
 const FileListHeader: React.FC<FileListHeaderProps> = ({
   path,
+  setPath,
   files,
   filesHandler,
 }) => {
   const { classes } = useStyles();
 
-  const allSelected = files.every((file) => file.selected);
+  const allSelected = files.length > 0 && files.every((file) => file.selected);
   const indeterminate = files.some((file) => file.selected) && !allSelected;
 
   const handleCheckboxChange = () =>
@@ -35,21 +37,36 @@ const FileListHeader: React.FC<FileListHeaderProps> = ({
       prev.map((file) => ({ ...file, selected: !allSelected }))
     );
 
+  const handleHomeClick = () => setPath([]);
+  const handleBreadcrumbClick = (e: React.MouseEvent) => {
+    const index = e.currentTarget.getAttribute('data-index');
+    if (!index) return;
+
+    setPath(path.slice(0, parseInt(index) + 1));
+  };
+
   return (
     <Paper className={classes.fileListHeader} radius={0} mb="xs">
       <Group p="xs" align="center" spacing="xs" noWrap>
         <Checkbox
+          disabled={files.length === 0}
           checked={allSelected}
           indeterminate={indeterminate}
           onChange={handleCheckboxChange}
         />
         <Text>{files.filter((file) => file.selected).length}</Text>
         <Breadcrumbs className={classes.breadcrumbs}>
-          <Anchor>
+          <Anchor onClick={handleHomeClick}>
             <FontAwesomeIcon icon={faHome} size="xs" />
           </Anchor>
           {path.map((item, index) => (
-            <Anchor key={index}>{item}</Anchor>
+            <Anchor
+              key={index}
+              onClick={handleBreadcrumbClick}
+              data-index={index}
+            >
+              {item}
+            </Anchor>
           ))}
         </Breadcrumbs>
       </Group>

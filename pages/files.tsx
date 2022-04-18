@@ -15,7 +15,7 @@ import React, { useEffect, useState } from 'react';
 const Files: NextPage = () => {
   const { classes } = useStyles();
 
-  const [path, usePath] = useState<string[]>([]);
+  const [path, setPath] = useState<string[]>([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [files, filesHandler] = useListState<IFile>();
 
@@ -42,7 +42,12 @@ const Files: NextPage = () => {
             <Group className={classes.fileActions} align="center">
               <Text>Wähle Dateien aus, um Aktionen auszuführen.</Text>
             </Group>
-            <FileList path={path} files={files} filesHandler={filesHandler} />
+            <FileList
+              path={path}
+              setPath={setPath}
+              files={files}
+              filesHandler={filesHandler}
+            />
           </>
         )}
       </Stack>

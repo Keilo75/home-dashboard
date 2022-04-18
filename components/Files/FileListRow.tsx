@@ -6,12 +6,14 @@ import FileIcon from './FileIcon';
 
 interface FileListRowProps {
   file: IFile;
+  setPath: React.Dispatch<React.SetStateAction<string[]>>;
   index: number;
   filesHandler: UseListStateHandler<IFile>;
 }
 
 const FileListRow: React.FC<FileListRowProps> = ({
   file,
+  setPath,
   index,
   filesHandler,
 }) => {
@@ -20,11 +22,18 @@ const FileListRow: React.FC<FileListRowProps> = ({
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     filesHandler.setItemProp(index, 'selected', e.currentTarget.checked);
 
+  const handleAnchorClick = () => {
+    if (file.isFolder) {
+      setPath((prev) => [...prev, file.name]);
+      return;
+    }
+  };
+
   return (
     <Group className={classes.fileListRow} spacing="xs">
       <Checkbox checked={file.selected} onChange={handleCheckboxChange} />
       <FileIcon type={file.isFolder ? 'folder' : file.extension.slice(1)} />
-      <Anchor>{file.name}</Anchor>
+      <Anchor onClick={handleAnchorClick}>{file.name}</Anchor>
     </Group>
   );
 };

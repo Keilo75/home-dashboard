@@ -18,24 +18,40 @@ import FileListRow from './FileListRow';
 
 interface FileListProps {
   path: string[];
+  setPath: React.Dispatch<React.SetStateAction<string[]>>;
   files: IFile[];
   filesHandler: UseListStateHandler<IFile>;
 }
 
-const FileList: React.FC<FileListProps> = ({ path, files, filesHandler }) => {
+const FileList: React.FC<FileListProps> = ({
+  path,
+  setPath,
+  files,
+  filesHandler,
+}) => {
   const { classes } = useStyles();
 
   return (
     <Paper shadow="xs" className={classes.fileList} radius={0}>
-      <FileListHeader path={path} files={files} filesHandler={filesHandler} />
-      {files.map((file, index) => (
-        <FileListRow
-          key={file.id}
-          file={file}
-          index={index}
-          filesHandler={filesHandler}
-        />
-      ))}
+      <FileListHeader
+        path={path}
+        setPath={setPath}
+        files={files}
+        filesHandler={filesHandler}
+      />
+      {files.length > 0 ? (
+        files.map((file, index) => (
+          <FileListRow
+            key={file.id}
+            setPath={setPath}
+            file={file}
+            index={index}
+            filesHandler={filesHandler}
+          />
+        ))
+      ) : (
+        <Text pl="sm">No files.</Text>
+      )}
     </Paper>
   );
 };
