@@ -1,6 +1,7 @@
 import React from 'react';
 import { useMantineColorScheme, ActionIcon, Tooltip } from '@mantine/core';
-import { Sun, MoonStars } from 'tabler-icons-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 
 const ThemeToggle: React.FC = () => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
@@ -21,7 +22,11 @@ const ThemeToggle: React.FC = () => {
               : theme.colors.blue[6],
         })}
       >
-        {colorScheme === 'dark' ? <Sun size={18} /> : <MoonStars size={18} />}
+        {colorScheme === 'dark' ? (
+          <FontAwesomeIcon icon={faSun} />
+        ) : (
+          <FontAwesomeIcon icon={faMoon} />
+        )}
       </ActionIcon>
     </Tooltip>
   );

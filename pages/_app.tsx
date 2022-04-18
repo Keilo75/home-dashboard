@@ -14,10 +14,18 @@ import {
   Text,
   Burger,
   Group,
+  Stack,
+  createStyles,
 } from '@mantine/core';
-import header from 'styles/Header.module.scss';
 import ThemeToggle from 'components/ThemeToggle/ThemeToggle';
 import Image from 'next/image';
+import NavButton, { NavButtonProps } from 'components/NavButton/NavButton';
+import { faHome, faServer } from '@fortawesome/free-solid-svg-icons';
+
+const navigationLinks: NavButtonProps[] = [
+  { label: 'Home', icon: faHome, url: '/' },
+  { label: 'Files', icon: faServer, url: '/files' },
+];
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props;
@@ -27,6 +35,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
+  const { classes } = useStyles();
 
   const toggleColorScheme = (value?: ColorScheme) => {
     const nextColorScheme =
@@ -53,6 +62,8 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
         <AppShell
           styles={{
             main: {
+              display: 'flex',
+              flexDirection: 'column',
               background:
                 colorScheme === 'dark'
                   ? theme.colors.dark[8]
@@ -61,7 +72,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
           }}
           fixed
           header={
-            <Header height={50} p="md" className={header.header}>
+            <Header height={50} p="md" className={classes.header}>
               <Group>
                 <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
                   <Burger
@@ -86,7 +97,11 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
               hidden={!opened}
               width={{ sm: 200, lg: 300 }}
             >
-              <Text>Application navbar</Text>
+              <Stack spacing={5}>
+                {navigationLinks.map((link) => (
+                  <NavButton key={link.label} {...link} />
+                ))}
+              </Stack>
             </Navbar>
           }
         >
@@ -101,3 +116,11 @@ App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
   // get color scheme from cookie
   colorScheme: getCookie('mantine-color-scheme', ctx) || 'dark',
 });
+
+const useStyles = createStyles(() => ({
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+}));
