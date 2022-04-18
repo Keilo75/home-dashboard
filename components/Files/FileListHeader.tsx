@@ -10,24 +10,40 @@ import {
   createStyles,
   Text,
 } from '@mantine/core';
+import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
+import { IFile } from 'models/files';
 import React from 'react';
 
 interface FileListHeaderProps {
   path: string[];
-  selectedFileIDs: string[];
+  files: IFile[];
+  filesHandler: UseListStateHandler<IFile>;
 }
 
 const FileListHeader: React.FC<FileListHeaderProps> = ({
   path,
-  selectedFileIDs,
+  files,
+  filesHandler,
 }) => {
   const { classes } = useStyles();
+
+  const allSelected = files.every((file) => file.selected);
+  const indeterminate = files.some((file) => file.selected) && !allSelected;
+
+  const handleCheckboxChange = () =>
+    filesHandler.setState((prev) =>
+      prev.map((file) => ({ ...file, selected: !allSelected }))
+    );
 
   return (
     <Paper className={classes.fileListHeader} radius={0} mb="xs">
       <Group p="xs" align="center" spacing="xs" noWrap>
-        <Checkbox />
-        <Text>{selectedFileIDs.length}</Text>
+        <Checkbox
+          checked={allSelected}
+          indeterminate={indeterminate}
+          onChange={handleCheckboxChange}
+        />
+        <Text>{files.filter((file) => file.selected).length}</Text>
         <Breadcrumbs className={classes.breadcrumbs}>
           <Anchor>
             <FontAwesomeIcon icon={faHome} size="xs" />

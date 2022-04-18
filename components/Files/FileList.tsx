@@ -10,6 +10,7 @@ import {
   Paper,
   Text,
 } from '@mantine/core';
+import type { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
 import { IFile } from 'models/files';
 import React from 'react';
 import FileListHeader from './FileListHeader';
@@ -17,22 +18,23 @@ import FileListRow from './FileListRow';
 
 interface FileListProps {
   path: string[];
-  selectedFileIDs: string[];
   files: IFile[];
+  filesHandler: UseListStateHandler<IFile>;
 }
 
-const FileList: React.FC<FileListProps> = ({
-  path,
-  files,
-  selectedFileIDs,
-}) => {
+const FileList: React.FC<FileListProps> = ({ path, files, filesHandler }) => {
   const { classes } = useStyles();
 
   return (
     <Paper shadow="xs" className={classes.fileList} radius={0}>
-      <FileListHeader path={path} selectedFileIDs={selectedFileIDs} />
-      {files.map((file) => (
-        <FileListRow key={file.id} file={file} />
+      <FileListHeader path={path} files={files} filesHandler={filesHandler} />
+      {files.map((file, index) => (
+        <FileListRow
+          key={file.id}
+          file={file}
+          index={index}
+          filesHandler={filesHandler}
+        />
       ))}
     </Paper>
   );

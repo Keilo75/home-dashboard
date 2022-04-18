@@ -15,7 +15,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<IFile[]>) => {
       fileList.map((file) => fs.stat(path.join(listPath, file)))
     )
   ).map<IFile>((stat, index) => {
-    const base: IBaseFile = { name: fileList[index], id: uuid() };
+    const base: IBaseFile = {
+      name: fileList[index],
+      id: uuid(),
+      selected: false,
+    };
 
     if (stat.isDirectory()) return { ...base, isFolder: true };
 

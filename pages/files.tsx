@@ -6,6 +6,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
+import { useListState } from '@mantine/hooks';
 import FileList from 'components/Files/FileList';
 import { IFile } from 'models/files';
 import { NextPage } from 'next';
@@ -15,22 +16,25 @@ const Files: NextPage = () => {
   const { classes } = useStyles();
 
   const [path, usePath] = useState<string[]>([]);
-  const [files, setFiles] = useState<IFile[]>();
-  const [selectedFileIDs, setSelectedFileIDs] = useState<string[]>([]);
+  const [loadingFiles, setLoadingFiles] = useState(false);
+  const [files, filesHandler] = useListState<IFile>();
 
   useEffect(() => {
-    setFiles(undefined);
+    setLoadingFiles(true);
 
     fetch(`/api/files/getList?path=${path.join('/')}`)
       .then((res) => res.json())
       .then((res) => {
-        setFiles(res);
+        filesHandler.setState(res);
+        setLoadingFiles(false);
       });
+    // filesHandler does not need to be added to the deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
 
   return (
     <>
-      <LoadingOverlay visible={files === undefined} />
+      <LoadingOverlay visible={loadingFiles} />
       <Title order={3}>Dateien</Title>
       <Stack className={classes.filesWrapper} spacing="xs">
         {files && (
@@ -38,11 +42,7 @@ const Files: NextPage = () => {
             <Group className={classes.fileActions} align="center">
               <Text>Wähle Dateien aus, um Aktionen auszuführen.</Text>
             </Group>
-            <FileList
-              path={path}
-              files={files}
-              selectedFileIDs={selectedFileIDs}
-            />
+            <FileList path={path} files={files} filesHandler={filesHandler} />
           </>
         )}
       </Stack>
