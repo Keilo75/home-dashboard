@@ -14,23 +14,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<IFile[]>) => {
     await Promise.all(
       fileList.map((file) => fs.stat(path.join(listPath, file)))
     )
-  ).map<IFile>((stat, index) => {
-    const base: IBaseFile = {
-      name: fileList[index],
-      id: uuid(),
-      selected: false,
-    };
+  )
+    .map<IFile>((stat, index) => {
+      const base: IBaseFile = {
+        name: fileList[index],
+        id: uuid(),
+        selected: false,
+      };
 
-    if (stat.isDirectory()) return { ...base, isFolder: true };
+      if (stat.isDirectory()) return { ...base, isFolder: true };
 
-    return {
-      ...base,
-      isFolder: false,
-      lastModified: stat.mtimeMs,
-      size: stat.size,
-      extension: path.extname(fileList[index]),
-    };
-  });
+      return {
+        ...base,
+        isFolder: false,
+        lastModified: stat.mtimeMs,
+        size: stat.size,
+        extension: path.extname(fileList[index]),
+      };
+    })
+    .sort((a, b) => (b.isFolder ? 1 : 0) - (a.isFolder ? 1 : 0));
 
   res.status(200).json(files);
 };

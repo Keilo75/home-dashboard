@@ -61,13 +61,6 @@ const FileListHeader: React.FC<FileListHeaderProps> = ({
 export default FileListHeader;
 
 const useStyles = createStyles((theme) => ({
-  fileList: {
-    flexGrow: 1,
-    flexBasis: 0,
-    overflowY: 'auto',
-    position: 'relative',
-  },
-
   fileListHeader: {
     position: 'sticky',
     top: 0,
