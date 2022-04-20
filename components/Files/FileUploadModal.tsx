@@ -98,7 +98,9 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
     setUploadProgress(0);
 
     const formData = new FormData();
-    uploadedFiles.forEach((file) => formData.append(file.name, file));
+    uploadedFiles.forEach((file, index) =>
+      formData.append(form.values.files[index].name, file)
+    );
 
     try {
       const response = await axios.post<IFileItem[]>(
