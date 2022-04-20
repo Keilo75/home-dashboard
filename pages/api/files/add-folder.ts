@@ -7,16 +7,12 @@ import { getFilesFromDir } from './get-list';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<IFile[]>) => {
   const currentPath = req.query.path as string;
+  const folder = req.query.folder as string;
   const userPath = path.join(filesPath, currentPath);
 
-  const filesToDelete = Array.isArray(req.query.file)
-    ? req.query.file
-    : [req.query.file];
-
   try {
-    await Promise.all(
-      filesToDelete.map((file) => fs.remove(path.join(userPath, file)))
-    );
+    const folderPath = path.join(userPath, folder);
+    await fs.mkdir(folderPath);
 
     const newFiles = await getFilesFromDir(userPath);
     res.status(200).json(newFiles);

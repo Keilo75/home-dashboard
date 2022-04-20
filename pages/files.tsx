@@ -19,6 +19,7 @@ import { showNotification } from '@mantine/notifications';
 import axios from 'axios';
 import FileList from 'components/Files/FileList';
 import FileUploadModal from 'components/Files/FileUploadModal';
+import NewFolderModal from 'components/Files/NewFolderModal';
 import { IFile } from 'models/files';
 import { NextPage } from 'next';
 import React, { useEffect, useState } from 'react';
@@ -31,7 +32,8 @@ const Files: NextPage = () => {
   const [files, filesHandler] = useListState<IFile>();
   const [isUploading, setIsUploading] = useState(false);
 
-  const [fileUploadModalOpened, fileUploadModalHandler] = useDisclosure(true);
+  const [fileUploadModalOpened, fileUploadModalHandler] = useDisclosure(false);
+  const [newFolderModalOpened, newFolderModalHandler] = useDisclosure(false);
 
   useEffect(() => {
     setLoadingFiles(true);
@@ -115,6 +117,7 @@ const Files: NextPage = () => {
               setPath={setPath}
               files={files}
               filesHandler={filesHandler}
+              openNewFolderModal={newFolderModalHandler.open}
             />
           </>
         )}
@@ -135,6 +138,19 @@ const Files: NextPage = () => {
           filesHandler={filesHandler}
           isUploading={isUploading}
           setIsUploading={setIsUploading}
+        />
+      </Modal>
+      <Modal
+        opened={newFolderModalOpened}
+        onClose={newFolderModalHandler.close}
+        centered
+        title="Neuer Ordner"
+      >
+        <NewFolderModal
+          files={files}
+          close={newFolderModalHandler.close}
+          path={path}
+          filesHandler={filesHandler}
         />
       </Modal>
     </>

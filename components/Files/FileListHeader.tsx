@@ -1,4 +1,4 @@
-import { faHome } from '@fortawesome/free-solid-svg-icons';
+import { faFolderPlus, faHome } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Paper,
@@ -9,6 +9,7 @@ import {
   Divider,
   createStyles,
   Text,
+  ActionIcon,
 } from '@mantine/core';
 import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
 import { IFile } from 'models/files';
@@ -19,6 +20,7 @@ interface FileListHeaderProps {
   setPath: React.Dispatch<React.SetStateAction<string[]>>;
   files: IFile[];
   filesHandler: UseListStateHandler<IFile>;
+  openNewFolderModal: () => void;
 }
 
 const FileListHeader: React.FC<FileListHeaderProps> = ({
@@ -26,6 +28,7 @@ const FileListHeader: React.FC<FileListHeaderProps> = ({
   setPath,
   files,
   filesHandler,
+  openNewFolderModal,
 }) => {
   const { classes } = useStyles();
 
@@ -69,6 +72,9 @@ const FileListHeader: React.FC<FileListHeaderProps> = ({
             </Anchor>
           ))}
         </Breadcrumbs>
+        <ActionIcon size="xs" onClick={openNewFolderModal}>
+          <FontAwesomeIcon icon={faFolderPlus} size="sm" />
+        </ActionIcon>
       </Group>
       <Divider />
     </Paper>

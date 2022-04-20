@@ -10,6 +10,7 @@ interface FileListProps {
   setPath: React.Dispatch<React.SetStateAction<string[]>>;
   files: IFile[];
   filesHandler: UseListStateHandler<IFile>;
+  openNewFolderModal: () => void;
 }
 
 const FileList: React.FC<FileListProps> = ({
@@ -17,6 +18,7 @@ const FileList: React.FC<FileListProps> = ({
   setPath,
   files,
   filesHandler,
+  openNewFolderModal,
 }) => {
   const { classes } = useStyles();
 
@@ -27,6 +29,7 @@ const FileList: React.FC<FileListProps> = ({
         setPath={setPath}
         files={files}
         filesHandler={filesHandler}
+        openNewFolderModal={openNewFolderModal}
       />
       {files.length > 0 ? (
         files.map((file, index) => (
