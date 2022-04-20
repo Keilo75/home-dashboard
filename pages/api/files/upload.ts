@@ -4,7 +4,7 @@ import { IFile } from 'models/files';
 import { filesPath } from 'models/paths';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
-import { getFilesFromDir } from './get-list';
+import { getFilesFromDir } from './list';
 
 export const config = {
   api: {

@@ -3,7 +3,7 @@ import { filesPath } from 'models/paths';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import fs from 'fs-extra';
-import { getFilesFromDir } from './get-list';
+import { getFilesFromDir } from './list';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<IFile[]>) => {
   const currentPath = req.query.path as string;

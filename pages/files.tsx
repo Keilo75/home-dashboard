@@ -39,7 +39,7 @@ const Files: NextPage = () => {
     setLoadingFiles(true);
 
     axios
-      .get<IFile[]>(`/api/files/get-list?path=${path.join('/')}`)
+      .get<IFile[]>(`/api/files/list?path=${path.join('/')}`)
       .then((res) => res.data)
       .then((res) => {
         filesHandler.setState(res);
