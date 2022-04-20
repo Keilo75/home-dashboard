@@ -10,6 +10,7 @@ import {
   Group,
   LoadingOverlay,
   Modal,
+  Paper,
   Stack,
   Text,
   Title,
@@ -17,7 +18,8 @@ import {
 import { useDisclosure, useListState } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import axios from 'axios';
-import FileList from 'components/Files/FileList';
+import FileListHeader from 'components/Files/FileListHeader';
+import FileListRow from 'components/Files/FileListRow';
 import FileUploadModal from 'components/Files/FileUploadModal';
 import NewFolderModal from 'components/Files/NewFolderModal';
 import { IFile } from 'models/files';
@@ -28,6 +30,7 @@ const Files: NextPage = () => {
   const { classes } = useStyles();
 
   const [path, setPath] = useState<string[]>([]);
+  const [isPathDirectory, setIsPathDirectory] = useState(true);
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [files, filesHandler] = useListState<IFile>();
   const [isUploading, setIsUploading] = useState(false);
@@ -38,16 +41,18 @@ const Files: NextPage = () => {
   useEffect(() => {
     setLoadingFiles(true);
 
-    axios
-      .get<IFile[]>(`/api/files/list?path=${path.join('/')}`)
-      .then((res) => res.data)
-      .then((res) => {
-        filesHandler.setState(res);
-        setLoadingFiles(false);
-      });
+    if (isPathDirectory) {
+      axios
+        .get<IFile[]>(`/api/files/list?path=${path.join('/')}`)
+        .then((res) => res.data)
+        .then((res) => {
+          filesHandler.setState(res);
+          setLoadingFiles(false);
+        });
+    }
     // filesHandler does not need to be added to the deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [path]);
+  }, [isPathDirectory, path]);
 
   const handleDelete = async () => {
     const selectedFileNames = files
@@ -112,13 +117,29 @@ const Files: NextPage = () => {
                 Upload
               </Button>
             </Group>
-            <FileList
-              path={path}
-              setPath={setPath}
-              files={files}
-              filesHandler={filesHandler}
-              openNewFolderModal={newFolderModalHandler.open}
-            />
+            <Paper shadow="xs" className={classes.fileList} radius={0}>
+              <FileListHeader
+                path={path}
+                setPath={setPath}
+                files={files}
+                filesHandler={filesHandler}
+                openNewFolderModal={newFolderModalHandler.open}
+              />
+              {files.length > 0 ? (
+                files.map((file, index) => (
+                  <FileListRow
+                    key={file.id}
+                    setPath={setPath}
+                    setIsPathDirectory={setIsPathDirectory}
+                    file={file}
+                    index={index}
+                    filesHandler={filesHandler}
+                  />
+                ))
+              ) : (
+                <Text pl="sm">Keine Dateien gefunden.</Text>
+              )}
+            </Paper>
           </>
         )}
       </Stack>
@@ -166,5 +187,12 @@ const useStyles = createStyles((theme) => ({
 
   fileActions: {
     height: 36,
+  },
+
+  fileList: {
+    flexGrow: 1,
+    flexBasis: 0,
+    overflowY: 'auto',
+    position: 'relative',
   },
 }));

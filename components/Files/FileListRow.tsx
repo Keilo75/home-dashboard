@@ -7,6 +7,7 @@ import FileIcon from './FileIcon';
 interface FileListRowProps {
   file: IFile;
   setPath: React.Dispatch<React.SetStateAction<string[]>>;
+  setIsPathDirectory: React.Dispatch<React.SetStateAction<boolean>>;
   index: number;
   filesHandler: UseListStateHandler<IFile>;
 }
@@ -14,6 +15,7 @@ interface FileListRowProps {
 const FileListRow: React.FC<FileListRowProps> = ({
   file,
   setPath,
+  setIsPathDirectory,
   index,
   filesHandler,
 }) => {
@@ -23,10 +25,8 @@ const FileListRow: React.FC<FileListRowProps> = ({
     filesHandler.setItemProp(index, 'selected', e.currentTarget.checked);
 
   const handleAnchorClick = () => {
-    if (file.isFolder) {
-      setPath((prev) => [...prev, file.name]);
-      return;
-    }
+    setIsPathDirectory(file.isFolder);
+    setPath((prev) => [...prev, file.name]);
   };
 
   return (
