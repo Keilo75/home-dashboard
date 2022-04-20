@@ -25,7 +25,7 @@ import React, { useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { FormList } from '@mantine/form/lib/form-list/form-list';
 import prettyBytes from 'pretty-bytes';
-import { IFile, isValidName } from 'models/files';
+import { IFileItem, isValidName } from 'models/files';
 import axios from 'axios';
 import { showNotification } from '@mantine/notifications';
 import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
@@ -38,8 +38,8 @@ interface Form {
 
 interface FileUploadModalProps {
   close: () => void;
-  files: IFile[];
-  filesHandler: UseListStateHandler<IFile>;
+  files: IFileItem[];
+  filesHandler: UseListStateHandler<IFileItem>;
   path: string[];
   isUploading: boolean;
   setIsUploading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -101,7 +101,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
     uploadedFiles.forEach((file) => formData.append(file.name, file));
 
     try {
-      const response = await axios.post<IFile[]>(
+      const response = await axios.post<IFileItem[]>(
         `/api/files/upload?path=${path}&folder=${form.values.folderName}`,
         formData,
         {
@@ -203,7 +203,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             <>
               <Divider my="sm" />
               <Switch
-                label="Unterordner in deinem momentanen Ordner erstellen?"
+                label="Unterordner in dem momentanen Ordner erstellen?"
                 {...form.getInputProps('createFolder', { type: 'checkbox' })}
                 mb="xs"
               />

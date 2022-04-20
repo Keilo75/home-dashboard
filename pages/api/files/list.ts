@@ -1,11 +1,14 @@
-import { IBaseFile, IFile } from 'models/files';
+import { IBaseFileItem, IFileItem } from 'models/files';
 import { filesPath } from 'models/paths';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import fs from 'fs-extra';
 import { v4 as uuid } from 'uuid';
 
-const handler = async (req: NextApiRequest, res: NextApiResponse<IFile[]>) => {
+const handler = async (
+  req: NextApiRequest,
+  res: NextApiResponse<IFileItem[]>
+) => {
   const currentPath = req.query.path as string;
   const userPath = path.join(filesPath, currentPath);
   const files = await getFilesFromDir(userPath);
@@ -15,13 +18,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<IFile[]>) => {
 
 export default handler;
 
-export const getFilesFromDir = async (dir: string): Promise<IFile[]> => {
+export const getFilesFromDir = async (dir: string): Promise<IFileItem[]> => {
   const fileList = await fs.readdir(dir);
   const files = (
     await Promise.all(fileList.map((file) => fs.stat(path.join(dir, file))))
   )
-    .map<IFile>((stat, index) => {
-      const base: IBaseFile = {
+    .map<IFileItem>((stat, index) => {
+      const base: IBaseFileItem = {
         name: fileList[index],
         id: uuid(),
         selected: false,

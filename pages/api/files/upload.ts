@@ -1,6 +1,6 @@
 import formidable from 'formidable';
 import fs from 'fs-extra';
-import { IFile } from 'models/files';
+import { IFileItem } from 'models/files';
 import { filesPath } from 'models/paths';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
@@ -12,7 +12,10 @@ export const config = {
   },
 };
 
-const handler = async (req: NextApiRequest, res: NextApiResponse<IFile[]>) => {
+const handler = async (
+  req: NextApiRequest,
+  res: NextApiResponse<IFileItem[]>
+) => {
   const currentPath = req.query.path as string;
   const folder = req.query.folder as string;
 

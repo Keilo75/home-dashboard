@@ -1,23 +1,23 @@
 import { Group, Checkbox, Anchor, createStyles } from '@mantine/core';
 import type { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
-import { IFile } from 'models/files';
+import { IFile, IFileItem } from 'models/files';
 import React from 'react';
 import FileIcon from './FileIcon';
 
 interface FileListRowProps {
-  file: IFile;
+  file: IFileItem;
   setPath: React.Dispatch<React.SetStateAction<string[]>>;
-  setIsPathDirectory: React.Dispatch<React.SetStateAction<boolean>>;
   index: number;
-  filesHandler: UseListStateHandler<IFile>;
+  filesHandler: UseListStateHandler<IFileItem>;
+  openFilePreviewModal: (file: IFile) => void;
 }
 
 const FileListRow: React.FC<FileListRowProps> = ({
   file,
   setPath,
-  setIsPathDirectory,
   index,
   filesHandler,
+  openFilePreviewModal,
 }) => {
   const { classes } = useStyles();
 
@@ -25,14 +25,18 @@ const FileListRow: React.FC<FileListRowProps> = ({
     filesHandler.setItemProp(index, 'selected', e.currentTarget.checked);
 
   const handleAnchorClick = () => {
-    setIsPathDirectory(file.isFolder);
-    setPath((prev) => [...prev, file.name]);
+    if (file.isFolder) {
+      setPath((prev) => [...prev, file.name]);
+      return;
+    }
+
+    openFilePreviewModal(file);
   };
 
   return (
     <Group className={classes.fileListRow} spacing="xs">
       <Checkbox checked={file.selected} onChange={handleCheckboxChange} />
-      <FileIcon type={file.isFolder ? 'folder' : file.extension.slice(1)} />
+      <FileIcon type={file.isFolder ? 'folder' : file.extension} />
       <Anchor onClick={handleAnchorClick}>{file.name}</Anchor>
     </Group>
   );

@@ -2,7 +2,7 @@ import { Button, Group, TextInput } from '@mantine/core';
 import { useForm, formList } from '@mantine/form';
 import React from 'react';
 import { v4 as uuid } from 'uuid';
-import { IFile, isValidName } from 'models/files';
+import { IFileItem, isValidName } from 'models/files';
 import axios from 'axios';
 import { showNotification } from '@mantine/notifications';
 import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
@@ -13,8 +13,8 @@ interface Form {
 
 interface FileUploadModalProps {
   close: () => void;
-  files: IFile[];
-  filesHandler: UseListStateHandler<IFile>;
+  files: IFileItem[];
+  filesHandler: UseListStateHandler<IFileItem>;
   path: string[];
 }
 
@@ -37,7 +37,7 @@ const NewFolderModal: React.FC<FileUploadModalProps> = ({
 
   const handleSubmit = async (values: Form) => {
     try {
-      const response = await axios.post<IFile[]>(
+      const response = await axios.post<IFileItem[]>(
         `/api/files/add-folder?path=${path.join('/')}&folder=${
           form.values.name
         }`

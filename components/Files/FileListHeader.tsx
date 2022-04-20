@@ -10,17 +10,19 @@ import {
   createStyles,
   Text,
   ActionIcon,
+  Modal,
 } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
-import { IFile } from 'models/files';
+import { IFileItem } from 'models/files';
 import React from 'react';
+import NewFolderModal from './NewFolderModal';
 
 interface FileListHeaderProps {
   path: string[];
   setPath: React.Dispatch<React.SetStateAction<string[]>>;
-  files: IFile[];
-  filesHandler: UseListStateHandler<IFile>;
-  openNewFolderModal: () => void;
+  files: IFileItem[];
+  filesHandler: UseListStateHandler<IFileItem>;
 }
 
 const FileListHeader: React.FC<FileListHeaderProps> = ({
@@ -28,9 +30,9 @@ const FileListHeader: React.FC<FileListHeaderProps> = ({
   setPath,
   files,
   filesHandler,
-  openNewFolderModal,
 }) => {
   const { classes } = useStyles();
+  const [newFolderModalOpened, newFolderModalHandler] = useDisclosure(false);
 
   const allSelected = files.length > 0 && files.every((file) => file.selected);
   const indeterminate = files.some((file) => file.selected) && !allSelected;
@@ -72,11 +74,24 @@ const FileListHeader: React.FC<FileListHeaderProps> = ({
             </Anchor>
           ))}
         </Breadcrumbs>
-        <ActionIcon size="xs" onClick={openNewFolderModal}>
+        <ActionIcon size="xs" onClick={newFolderModalHandler.open}>
           <FontAwesomeIcon icon={faFolderPlus} size="sm" />
         </ActionIcon>
       </Group>
       <Divider />
+      <Modal
+        opened={newFolderModalOpened}
+        onClose={newFolderModalHandler.close}
+        centered
+        title="Neuer Ordner"
+      >
+        <NewFolderModal
+          files={files}
+          close={newFolderModalHandler.close}
+          path={path}
+          filesHandler={filesHandler}
+        />
+      </Modal>
     </Paper>
   );
 };
@@ -87,6 +102,7 @@ const useStyles = createStyles((theme) => ({
   fileListHeader: {
     position: 'sticky',
     top: 0,
+    zIndex: 1,
   },
 
   breadcrumbs: {

@@ -20,39 +20,39 @@ import { showNotification } from '@mantine/notifications';
 import axios from 'axios';
 import FileListHeader from 'components/Files/FileListHeader';
 import FileListRow from 'components/Files/FileListRow';
+import FilePreviewModal from 'components/Files/FilePreviewModal';
 import FileUploadModal from 'components/Files/FileUploadModal';
-import NewFolderModal from 'components/Files/NewFolderModal';
-import { IFile } from 'models/files';
+import { IFile, IFileItem } from 'models/files';
 import { NextPage } from 'next';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const Files: NextPage = () => {
   const { classes } = useStyles();
 
   const [path, setPath] = useState<string[]>([]);
-  const [isPathDirectory, setIsPathDirectory] = useState(true);
   const [loadingFiles, setLoadingFiles] = useState(false);
-  const [files, filesHandler] = useListState<IFile>();
+  const [files, filesHandler] = useListState<IFileItem>();
   const [isUploading, setIsUploading] = useState(false);
 
   const [fileUploadModalOpened, fileUploadModalHandler] = useDisclosure(false);
-  const [newFolderModalOpened, newFolderModalHandler] = useDisclosure(false);
+  const [filePreviewModalOpened, filePreviewModalHandler] =
+    useDisclosure(false);
+  const filePreviewModalFile = useRef<IFile>();
 
   useEffect(() => {
     setLoadingFiles(true);
 
-    if (isPathDirectory) {
-      axios
-        .get<IFile[]>(`/api/files/list?path=${path.join('/')}`)
-        .then((res) => res.data)
-        .then((res) => {
-          filesHandler.setState(res);
-          setLoadingFiles(false);
-        });
-    }
+    axios
+      .get<IFileItem[]>(`/api/files/list?path=${path.join('/')}`)
+      .then((res) => res.data)
+      .then((res) => {
+        filesHandler.setState(res);
+        setLoadingFiles(false);
+      });
+
     // filesHandler does not need to be added to the deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPathDirectory, path]);
+  }, [path]);
 
   const handleDelete = async () => {
     const selectedFileNames = files
@@ -63,7 +63,7 @@ const Files: NextPage = () => {
       const request = `/api/files/delete?path=${path.join(
         '/'
       )}${selectedFileNames.map((file) => `&file=${file}`).join('')}`;
-      const response = await axios.delete<IFile[]>(request);
+      const response = await axios.delete<IFileItem[]>(request);
 
       filesHandler.setState(response.data);
     } catch (err) {
@@ -75,6 +75,11 @@ const Files: NextPage = () => {
         color: 'red',
       });
     }
+  };
+
+  const openFilePreviewModal = (file: IFile) => {
+    filePreviewModalFile.current = file;
+    filePreviewModalHandler.open();
   };
 
   return (
@@ -123,17 +128,16 @@ const Files: NextPage = () => {
                 setPath={setPath}
                 files={files}
                 filesHandler={filesHandler}
-                openNewFolderModal={newFolderModalHandler.open}
               />
               {files.length > 0 ? (
                 files.map((file, index) => (
                   <FileListRow
                     key={file.id}
                     setPath={setPath}
-                    setIsPathDirectory={setIsPathDirectory}
                     file={file}
                     index={index}
                     filesHandler={filesHandler}
+                    openFilePreviewModal={openFilePreviewModal}
                   />
                 ))
               ) : (
@@ -162,17 +166,18 @@ const Files: NextPage = () => {
         />
       </Modal>
       <Modal
-        opened={newFolderModalOpened}
-        onClose={newFolderModalHandler.close}
+        opened={filePreviewModalOpened}
+        onClose={filePreviewModalHandler.close}
         centered
-        title="Neuer Ordner"
+        title="Vorschau"
       >
-        <NewFolderModal
-          files={files}
-          close={newFolderModalHandler.close}
-          path={path}
-          filesHandler={filesHandler}
-        />
+        {filePreviewModalFile.current && (
+          <FilePreviewModal
+            close={filePreviewModalHandler.close}
+            file={filePreviewModalFile.current}
+            path={path}
+          />
+        )}
       </Modal>
     </>
   );
