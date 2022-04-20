@@ -21,6 +21,7 @@ import ThemeToggle from 'components/ThemeToggle/ThemeToggle';
 import Image from 'next/image';
 import NavButton, { NavButtonProps } from 'components/NavButton/NavButton';
 import { faHome, faServer } from '@fortawesome/free-solid-svg-icons';
+import { NotificationsProvider } from '@mantine/notifications';
 
 const navigationLinks: NavButtonProps[] = [
   { label: 'Home', icon: faHome, url: '/' },
@@ -59,54 +60,56 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
           Tooltip: { gutter: 10, withArrow: true, transition: 'pop' },
         }}
       >
-        <AppShell
-          styles={{
-            main: {
-              display: 'flex',
-              flexDirection: 'column',
-              background:
-                colorScheme === 'dark'
-                  ? theme.colors.dark[8]
-                  : theme.colors.gray[0],
-            },
-          }}
-          fixed
-          header={
-            <Header height={50} p="md" className={classes.header}>
-              <Group>
-                <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
-                  <Burger
-                    opened={opened}
-                    onClick={() => setOpened((o) => !o)}
-                    size="sm"
-                    color={theme.colors.gray[6]}
-                  />
-                </MediaQuery>
+        <NotificationsProvider>
+          <AppShell
+            styles={{
+              main: {
+                display: 'flex',
+                flexDirection: 'column',
+                background:
+                  colorScheme === 'dark'
+                    ? theme.colors.dark[8]
+                    : theme.colors.gray[0],
+              },
+            }}
+            fixed
+            header={
+              <Header height={50} p="md" className={classes.header}>
+                <Group>
+                  <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+                    <Burger
+                      opened={opened}
+                      onClick={() => setOpened((o) => !o)}
+                      size="sm"
+                      color={theme.colors.gray[6]}
+                    />
+                  </MediaQuery>
 
-                <Image src="/logo.svg" height={25} width={25} alt="logo" />
-                <Text>Home</Text>
-              </Group>
-              <ThemeToggle />
-            </Header>
-          }
-          navbarOffsetBreakpoint="sm"
-          navbar={
-            <Navbar
-              p="md"
-              hiddenBreakpoint="sm"
-              hidden={!opened}
-              width={{ sm: 200, lg: 300 }}
-            >
-              <Stack spacing={5}>
-                {navigationLinks.map((link) => (
-                  <NavButton key={link.label} {...link} />
-                ))}
-              </Stack>
-            </Navbar>
-          }
-        >
-          <Component {...pageProps} />
-        </AppShell>
+                  <Image src="/logo.svg" height={25} width={25} alt="logo" />
+                  <Text>Home</Text>
+                </Group>
+                <ThemeToggle />
+              </Header>
+            }
+            navbarOffsetBreakpoint="sm"
+            navbar={
+              <Navbar
+                p="md"
+                hiddenBreakpoint="sm"
+                hidden={!opened}
+                width={{ sm: 200, lg: 300 }}
+              >
+                <Stack spacing={5}>
+                  {navigationLinks.map((link) => (
+                    <NavButton key={link.label} {...link} />
+                  ))}
+                </Stack>
+              </Navbar>
+            }
+          >
+            <Component {...pageProps} />
+          </AppShell>
+        </NotificationsProvider>
       </MantineProvider>
     </ColorSchemeProvider>
   );

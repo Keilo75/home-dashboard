@@ -8,12 +8,17 @@ import { v4 as uuid } from 'uuid';
 const handler = async (req: NextApiRequest, res: NextApiResponse<IFile[]>) => {
   const reqPath = req.query.path as string;
   const listPath = path.join(filesPath, reqPath);
+  const files = await getFilesFromDir(listPath);
 
-  const fileList = await fs.readdir(listPath);
+  res.status(200).json(files);
+};
+
+export default handler;
+
+export const getFilesFromDir = async (dir: string): Promise<IFile[]> => {
+  const fileList = await fs.readdir(dir);
   const files = (
-    await Promise.all(
-      fileList.map((file) => fs.stat(path.join(listPath, file)))
-    )
+    await Promise.all(fileList.map((file) => fs.stat(path.join(dir, file))))
   )
     .map<IFile>((stat, index) => {
       const base: IBaseFile = {
@@ -34,7 +39,5 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<IFile[]>) => {
     })
     .sort((a, b) => (b.isFolder ? 1 : 0) - (a.isFolder ? 1 : 0));
 
-  res.status(200).json(files);
+  return files;
 };
-
-export default handler;

@@ -15,6 +15,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useDisclosure, useListState } from '@mantine/hooks';
+import axios from 'axios';
 import FileList from 'components/Files/FileList';
 import FileUploadModal from 'components/Files/FileUploadModal';
 import { IFile } from 'models/files';
@@ -27,14 +28,16 @@ const Files: NextPage = () => {
   const [path, setPath] = useState<string[]>([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [files, filesHandler] = useListState<IFile>();
+  const [isUploading, setIsUploading] = useState(false);
 
   const [fileUploadModalOpened, fileUploadModalHandler] = useDisclosure(true);
 
   useEffect(() => {
     setLoadingFiles(true);
 
-    fetch(`/api/files/getList?path=${path.join('/')}`)
-      .then((res) => res.json())
+    axios
+      .get<IFile[]>(`/api/files/get-list?path=${path.join('/')}`)
+      .then((res) => res.data)
       .then((res) => {
         filesHandler.setState(res);
         setLoadingFiles(false);
@@ -96,8 +99,18 @@ const Files: NextPage = () => {
         onClose={fileUploadModalHandler.close}
         centered
         title="Upload"
+        withCloseButton={!isUploading}
+        closeOnClickOutside={!isUploading}
+        closeOnEscape={!isUploading}
       >
-        <FileUploadModal close={fileUploadModalHandler.close} path={path} />
+        <FileUploadModal
+          files={files}
+          close={fileUploadModalHandler.close}
+          path={path}
+          filesHandler={filesHandler}
+          isUploading={isUploading}
+          setIsUploading={setIsUploading}
+        />
       </Modal>
     </>
   );
