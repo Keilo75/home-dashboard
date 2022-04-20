@@ -24,7 +24,7 @@ import { faHome, faServer } from '@fortawesome/free-solid-svg-icons';
 
 const navigationLinks: NavButtonProps[] = [
   { label: 'Home', icon: faHome, url: '/' },
-  { label: 'Files', icon: faServer, url: '/files' },
+  { label: 'Dateien', icon: faServer, url: '/files' },
 ];
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {

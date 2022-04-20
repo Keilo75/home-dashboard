@@ -1,15 +1,4 @@
-import { faHome } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  Anchor,
-  Breadcrumbs,
-  Checkbox,
-  createStyles,
-  Divider,
-  Group,
-  Paper,
-  Text,
-} from '@mantine/core';
+import { createStyles, Paper, Text } from '@mantine/core';
 import type { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
 import { IFile } from 'models/files';
 import React from 'react';
@@ -50,7 +39,7 @@ const FileList: React.FC<FileListProps> = ({
           />
         ))
       ) : (
-        <Text pl="sm">No files.</Text>
+        <Text pl="sm">Keine Dateien gefunden.</Text>
       )}
     </Paper>
   );

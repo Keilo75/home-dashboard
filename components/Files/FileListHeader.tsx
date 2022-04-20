@@ -32,10 +32,11 @@ const FileListHeader: React.FC<FileListHeaderProps> = ({
   const allSelected = files.length > 0 && files.every((file) => file.selected);
   const indeterminate = files.some((file) => file.selected) && !allSelected;
 
-  const handleCheckboxChange = () =>
+  const handleCheckboxChange = (e: React.ChangeEvent) => {
     filesHandler.setState((prev) =>
       prev.map((file) => ({ ...file, selected: !allSelected }))
     );
+  };
 
   const handleHomeClick = () => setPath([]);
   const handleBreadcrumbClick = (e: React.MouseEvent) => {
@@ -49,7 +50,6 @@ const FileListHeader: React.FC<FileListHeaderProps> = ({
     <Paper className={classes.fileListHeader} radius={0} mb="xs">
       <Group p="xs" align="center" spacing="xs" noWrap>
         <Checkbox
-          disabled={files.length === 0}
           checked={allSelected}
           indeterminate={indeterminate}
           onChange={handleCheckboxChange}

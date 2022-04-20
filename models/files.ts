@@ -16,3 +16,8 @@ export type IFile = IBaseFile &
         extension: string;
       }
   );
+
+export const isValidName = (name: string) =>
+  name.match(
+    /^(con|prn|aux|nul|com[0-9]|lpt[0-9])$|([<>:"\/\\|?*])|(\.|\s)$/gi
+  );
