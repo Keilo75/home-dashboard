@@ -15,6 +15,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useDisclosure, useListState } from '@mantine/hooks';
+import { showNotification } from '@mantine/notifications';
 import axios from 'axios';
 import FileList from 'components/Files/FileList';
 import FileUploadModal from 'components/Files/FileUploadModal';
@@ -46,6 +47,29 @@ const Files: NextPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
 
+  const handleDelete = async () => {
+    const selectedFileNames = files
+      .filter((file) => file.selected)
+      .map((file) => file.name);
+
+    try {
+      const request = `/api/files/delete?path=${path.join(
+        '/'
+      )}${selectedFileNames.map((file) => `&file=${file}`).join('')}`;
+      const response = await axios.delete<IFile[]>(request);
+
+      filesHandler.setState(response.data);
+    } catch (err) {
+      console.error(err);
+
+      showNotification({
+        title: 'Etwas ist schiefgelaufen...',
+        message: 'Die Datei(en) konnten nicht gelöscht werden',
+        color: 'red',
+      });
+    }
+  };
+
   return (
     <>
       <LoadingOverlay visible={loadingFiles} />
@@ -70,6 +94,7 @@ const Files: NextPage = () => {
                     <Button
                       color="red"
                       leftIcon={<FontAwesomeIcon icon={faTrashAlt} />}
+                      onClick={handleDelete}
                     >
                       Lösche
                     </Button>

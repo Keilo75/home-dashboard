@@ -6,9 +6,9 @@ import fs from 'fs-extra';
 import { v4 as uuid } from 'uuid';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<IFile[]>) => {
-  const reqPath = req.query.path as string;
-  const listPath = path.join(filesPath, reqPath);
-  const files = await getFilesFromDir(listPath);
+  const currentPath = req.query.path as string;
+  const userPath = path.join(filesPath, currentPath);
+  const files = await getFilesFromDir(userPath);
 
   res.status(200).json(files);
 };
