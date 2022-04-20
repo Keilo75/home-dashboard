@@ -8,9 +8,12 @@ import {
   ActionIcon,
   Button,
   createStyles,
+  Divider,
   Group,
+  Overlay,
   Paper,
   Stack,
+  Switch,
   Text,
   TextInput,
 } from '@mantine/core';
@@ -25,21 +28,37 @@ import { isValidName } from 'models/files';
 
 interface Form {
   files: FormList<{ name: string; id: string }>;
+  createFolder: boolean;
+  folderName: string;
 }
 
 interface FileUploadModalProps {
   close: () => void;
+  path: string[];
 }
 
-const FileUploadModal: React.FC<FileUploadModalProps> = ({ close }) => {
+const FileUploadModal: React.FC<FileUploadModalProps> = ({ close, path }) => {
   const { classes } = useStyles();
 
   const [uploadedFiles, uploadedFilesHandler] = useListState<File>([]);
   const form = useForm<Form>({
-    initialValues: { files: formList([]) },
+    initialValues: { files: formList([]), createFolder: false, folderName: '' },
     validate: {
       files: {
-        name: (value) => (isValidName(value) ? 'Ungültiger Name' : null),
+        name: (value) => {
+          if (
+            form.values.files.filter((file) => file.name === value).length > 1
+          )
+            return 'Doppelter Name';
+
+          return isValidName(value) ? 'Ungültiger Name' : null;
+        },
+      },
+
+      folderName: (value) => {
+        if (!form.values.createFolder) return null;
+
+        return isValidName(value) ? 'Ungültiger Name' : null;
       },
     },
   });
@@ -89,7 +108,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ close }) => {
               };
 
               return (
-                <Group key={file.id}>
+                <Group key={file.id} align="flex-start">
                   <TextInput
                     placeholder="Name"
                     className={classes.nameInput}
@@ -105,6 +124,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ close }) => {
                     color="red"
                     variant="hover"
                     onClick={handleFileRemove}
+                    mt={3}
                   >
                     <FontAwesomeIcon icon={faTrashAlt} size="xs" />
                   </ActionIcon>
@@ -120,7 +140,25 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ close }) => {
           {prettyBytes(uploadedFiles.reduce((acc, cur) => acc + cur.size, 0))}
         </Text>
 
-        <Group position="right" spacing="xs">
+        {uploadedFiles.length > 0 && (
+          <>
+            <Divider my="sm" />
+            <Switch
+              label="Unterordner in deinem momentanen Ordner erstellen?"
+              {...form.getInputProps('createFolder', { type: 'checkbox' })}
+              mb="xs"
+            />
+            {form.values.createFolder && (
+              <TextInput
+                required
+                label="Ordnername"
+                {...form.getInputProps('folderName')}
+              />
+            )}
+          </>
+        )}
+
+        <Group position="right" spacing="xs" mt="sm">
           <Button variant="default" onClick={close}>
             Zurück
           </Button>

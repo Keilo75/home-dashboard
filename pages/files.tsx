@@ -97,7 +97,7 @@ const Files: NextPage = () => {
         centered
         title="Upload"
       >
-        <FileUploadModal close={fileUploadModalHandler.close} />
+        <FileUploadModal close={fileUploadModalHandler.close} path={path} />
       </Modal>
     </>
   );
