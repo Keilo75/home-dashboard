@@ -1,4 +1,8 @@
-import { faTrashAlt, faUpload } from '@fortawesome/free-solid-svg-icons';
+import {
+  faRotateLeft,
+  faTrashAlt,
+  faUpload,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   ActionIcon,
@@ -77,6 +81,13 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ close }) => {
                 form.removeListItem('files', index);
               };
 
+              const handleFileNameReset = () => {
+                form.setListItem('files', index, {
+                  name: uploadedFiles[index].name,
+                  id: uuid(),
+                });
+              };
+
               return (
                 <Group key={file.id}>
                   <TextInput
@@ -84,6 +95,11 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ close }) => {
                     className={classes.nameInput}
                     required
                     {...form.getListInputProps('files', index, 'name')}
+                    rightSection={
+                      <ActionIcon onClick={handleFileNameReset}>
+                        <FontAwesomeIcon icon={faRotateLeft} size="xs" />
+                      </ActionIcon>
+                    }
                   />
                   <ActionIcon
                     color="red"
