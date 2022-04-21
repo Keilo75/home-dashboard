@@ -1,7 +1,8 @@
 const express = require('express');
 const next = require('next');
-const path = require("path");
-const fs = require("fs")
+const path = require('path');
+const fs = require('fs');
+const generateZip = require('./generateZip');
 
 const dev = process.env.NODE_ENV !== 'production';
 const port = dev ? 3000 : 80;
@@ -11,7 +12,7 @@ const handle = app.getRequestHandler();
 app.prepare().then(() => {
   const server = express();
 
-  server.get('/download', (req, res) => {
+  server.get('/download', async (req, res) => {
     const filesPath = path.join(process.cwd(), '..', 'files');
 
     const currentPath = req.query.path;
@@ -21,18 +22,22 @@ app.prepare().then(() => {
       ? req.query.file
       : [req.query.file];
 
-    const firstFilePath = path.join(userPath, files[0])
+    const firstFilePath = path.join(userPath, files[0]);
     if (files.length === 1 && !fs.statSync(firstFilePath).isDirectory()) {
-      res.setHeader("Content-Disposition", `attachment; filename=${files}`)
-      res.status(200).sendFile(firstFilePath)
+      res.setHeader('Content-Disposition', `attachment; filename=${files[0]}`);
+      res.status(200).sendFile(firstFilePath);
     } else {
-      res.status(200).send(filesPath)
+      const base64 = await generateZip(userPath, files);
+      const zip = Buffer.from(base64, "base64");
 
+      res.setHeader("Content-Type", "application/zip")
+      res.setHeader('Content-Disposition', `attachment; filename=download.zip`);
+
+      res.status(200).send(zip);
     }
+  });
 
-  })
-
-  server.get('*', (req, res) => {
+  server.all('*', (req, res) => {
     return handle(req, res);
   });
 

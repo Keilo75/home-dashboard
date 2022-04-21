@@ -104,7 +104,9 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
 
     try {
       const response = await axios.post<IFileItem[]>(
-        `/api/files/upload?path=${path}&folder=${form.values.folderName}`,
+        `/api/files/upload?path=${path.join('/')}&folder=${
+          form.values.folderName
+        }`,
         formData,
         {
           onUploadProgress: (e) => {
