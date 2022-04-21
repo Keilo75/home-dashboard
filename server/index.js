@@ -1,6 +1,7 @@
 const express = require('express');
 const next = require('next');
-const path = require("path")
+const path = require("path");
+const fs = require("fs")
 
 const dev = process.env.NODE_ENV !== 'production';
 const port = dev ? 3000 : 80;
@@ -20,9 +21,10 @@ app.prepare().then(() => {
       ? req.query.file
       : [req.query.file];
 
-    if (files.length === 1) {
-      res.setHeader("Content-Disposition", `attachment; filename=${files[0]}`)
-      res.status(200).sendFile(path.join(userPath, files[0]))
+    const firstFilePath = path.join(userPath, files[0])
+    if (files.length === 1 && !fs.statSync(firstFilePath).isDirectory()) {
+      res.setHeader("Content-Disposition", `attachment; filename=${files}`)
+      res.status(200).sendFile(firstFilePath)
     } else {
       res.status(200).send(filesPath)
 
