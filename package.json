@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server/index.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -19,6 +19,7 @@
     "@mantine/notifications": "^4.1.4",
     "axios": "^0.26.1",
     "cookies-next": "^2.0.4",
+    "express": "^4.17.3",
     "formidable": "^2.0.1",
     "fs-extra": "^10.1.0",
     "mime-types": "^2.1.35",

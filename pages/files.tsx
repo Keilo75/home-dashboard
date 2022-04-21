@@ -82,6 +82,15 @@ const Files: NextPage = () => {
     filePreviewModalHandler.open();
   };
 
+  const handleDownload = () => {
+    window.open(
+      `/download?path=${path.join('/')}${files
+        .filter((file) => file.selected)
+        .map((file) => `&file=${file.name}`)
+        .join('')}`
+    );
+  };
+
   return (
     <>
       <LoadingOverlay visible={loadingFiles} />
@@ -100,6 +109,7 @@ const Files: NextPage = () => {
                     <Button
                       color="teal"
                       leftIcon={<FontAwesomeIcon icon={faDownload} />}
+                      onClick={handleDownload}
                     >
                       Download
                     </Button>
