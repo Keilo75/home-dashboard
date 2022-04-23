@@ -33,5 +33,5 @@ module.exports = generateZip = async (currentPath, files) => {
     }
   });
 
-  return await zip.generateAsync({ type: 'base64' });
+  return await zip.generateAsync({ type: 'nodebuffer' });
 }

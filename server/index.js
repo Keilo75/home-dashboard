@@ -18,22 +18,33 @@ app.prepare().then(() => {
     const currentPath = req.query.path;
     const userPath = path.join(filesPath, currentPath);
 
-    const file =
-      req.query.file
+    const file = req.query.file
 
     const filePath = path.join(userPath, file);
     res.setHeader('Content-Disposition', `attachment; filename=${file}`);
-    res.status(200).sendFile(filePath);
-    return;
-    const base64 = await generateZip(userPath, files);
-    const zip = Buffer.from(base64, "base64");
+    res.status(200).sendFile(filePath, {}, () => {
+      console.log("finished");
+      const wasZip = req.query.zip === "1";
+      if (wasZip) {
+        fs.unlinkSync(filePath)
+      }
+    });
 
-    res.setHeader("Content-Type", "application/zip")
-    res.setHeader('Content-Disposition', `attachment; filename=download.zip`);
 
-    res.status(200).send(zip);
 
   });
+
+  server.post('/zip', async (req, res) => {
+    const filesPath = path.join(process.cwd(), '..', 'files');
+
+    const currentPath = req.query.path;
+    const userPath = path.join(filesPath, currentPath);
+
+    const files = Array.isArray(req.query.file) ? req.query.file : [req.query.file];
+    const buffer = await generateZip(userPath, files);
+    fs.writeFileSync(path.join(process.cwd(), '..', 'download.zip'), buffer);
+    res.status(200).send('');
+  })
 
   server.all('*', (req, res) => {
     return handle(req, res);

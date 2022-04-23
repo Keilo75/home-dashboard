@@ -6,10 +6,13 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Button,
+  Center,
   createStyles,
   Group,
+  Loader,
   LoadingOverlay,
   Modal,
+  Overlay,
   Paper,
   Stack,
   Text,
@@ -33,6 +36,7 @@ const Files: NextPage = () => {
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [files, filesHandler] = useListState<IFileItem>();
   const [isUploading, setIsUploading] = useState(false);
+  const [creatingZIP, setCreatingZIP] = useState<'loading' | 'finished'>();
 
   const [fileUploadModalOpened, fileUploadModalHandler] = useDisclosure(false);
   const [filePreviewModalOpened, filePreviewModalHandler] =
@@ -82,25 +86,75 @@ const Files: NextPage = () => {
     filePreviewModalHandler.open();
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const selectedFiles = files.filter((file) => file.selected);
     const needsZip =
       selectedFiles.length > 1 || selectedFiles.some((file) => file.isFolder);
 
     if (!needsZip) {
       window.open(
-        `/download?path=${path.join('/')}${files
+        `/download?path=${path.join('/')}&file=${selectedFiles[0].name}&zip=0`
+      );
+
+      return;
+    }
+
+    try {
+      setCreatingZIP('loading');
+
+      await axios.post<string>(
+        `/zip?path=${path.join('/')}${files
           .filter((file) => file.selected)
           .map((file) => `&file=${file.name}`)
           .join('')}`
       );
+      setCreatingZIP('finished');
+    } catch {
+      showNotification({
+        title: 'ZIP-Datei konnte nicht erstellt werden',
+        message: 'Maximale Größe ist 100MB',
+        color: 'red',
+      });
+      setCreatingZIP(undefined);
     }
 
     return;
   };
 
+  const handleZIPDownload = () => {
+    setCreatingZIP(undefined);
+    setTimeout(() => {
+      window.open(`/download?path=..&file=download.zip&zip=1`);
+    }, 10);
+  };
+
   return (
     <>
+      {creatingZIP !== undefined && (
+        <>
+          <Overlay color="black" />
+          <Center className={classes.creatingZIPCenter}>
+            <Stack align="center">
+              <Text>
+                {creatingZIP === 'loading' ? 'Erstelle ZIP-Datei' : 'Fertig!'}
+              </Text>
+              {creatingZIP === 'loading' ? (
+                <>
+                  <Loader />
+                </>
+              ) : (
+                <Button
+                  color="teal"
+                  leftIcon={<FontAwesomeIcon icon={faDownload} />}
+                  onClick={handleZIPDownload}
+                >
+                  Download
+                </Button>
+              )}
+            </Stack>
+          </Center>
+        </>
+      )}
       <LoadingOverlay visible={loadingFiles} />
       <Title order={3}>Dateien</Title>
       <Stack className={classes.filesWrapper} spacing="xs">
@@ -217,5 +271,11 @@ const useStyles = createStyles((theme) => ({
     flexBasis: 0,
     overflowY: 'auto',
     position: 'relative',
+  },
+
+  creatingZIPCenter: {
+    zIndex: 100000,
+    position: 'absolute',
+    inset: 0,
   },
 }));
