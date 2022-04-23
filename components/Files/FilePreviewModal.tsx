@@ -50,7 +50,6 @@ const FilePreviewModal: React.FC<FileUploadModalProps> = ({
                 file.name
               }`}
               onLoad={handleIFrameLoad}
-              width={400}
             />
           </Center>
         )}
