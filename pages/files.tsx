@@ -83,12 +83,20 @@ const Files: NextPage = () => {
   };
 
   const handleDownload = () => {
-    window.open(
-      `/download?path=${path.join('/')}${files
-        .filter((file) => file.selected)
-        .map((file) => `&file=${file.name}`)
-        .join('')}`
-    );
+    const selectedFiles = files.filter((file) => file.selected);
+    const needsZip =
+      selectedFiles.length > 1 || selectedFiles.some((file) => file.isFolder);
+
+    if (!needsZip) {
+      window.open(
+        `/download?path=${path.join('/')}${files
+          .filter((file) => file.selected)
+          .map((file) => `&file=${file.name}`)
+          .join('')}`
+      );
+    }
+
+    return;
   };
 
   return (
