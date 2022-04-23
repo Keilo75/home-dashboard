@@ -23,7 +23,6 @@ app.prepare().then(() => {
     const filePath = path.join(userPath, file);
     res.setHeader('Content-Disposition', `attachment; filename=${file}`);
     res.status(200).sendFile(filePath, {}, () => {
-      console.log("finished");
       const wasZip = req.query.zip === "1";
       if (wasZip) {
         fs.unlinkSync(filePath)
