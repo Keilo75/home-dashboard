@@ -19,11 +19,11 @@ import {
 } from '@mantine/core';
 import ThemeToggle from 'components/ThemeToggle/ThemeToggle';
 import Image from 'next/image';
-import NavButton, { NavButtonProps } from 'components/NavButton/NavButton';
+import NavButton, { INavButton } from 'components/NavButton/NavButton';
 import { faHome, faServer } from '@fortawesome/free-solid-svg-icons';
 import { NotificationsProvider } from '@mantine/notifications';
 
-const navigationLinks: NavButtonProps[] = [
+const navigationLinks: INavButton[] = [
   { label: 'Home', icon: faHome, url: '/' },
   { label: 'Dateien', icon: faServer, url: '/files' },
 ];
@@ -101,7 +101,11 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
               >
                 <Stack spacing={5}>
                   {navigationLinks.map((link) => (
-                    <NavButton key={link.label} {...link} />
+                    <NavButton
+                      key={link.label}
+                      button={link}
+                      setOpened={setOpened}
+                    />
                   ))}
                 </Stack>
               </Navbar>

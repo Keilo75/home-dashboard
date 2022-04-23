@@ -6,21 +6,34 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import useStyles from './NavButton.styles';
 
-export interface NavButtonProps {
+export interface INavButton {
   icon: IconDefinition;
   label: string;
   url: string;
 }
 
-const NavButton: React.FC<NavButtonProps> = ({ icon, label, url }) => {
+interface NavButtonProps {
+  button: INavButton;
+  setOpened: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const NavButton: React.FC<NavButtonProps> = ({ button, setOpened }) => {
   const { classes, cx } = useStyles();
   const { pathname } = useRouter();
 
+  const handleClick = () => setOpened(false);
+
   return (
-    <Link href={url} passHref>
-      <a className={cx(classes.link, pathname === url && classes.linkActive)}>
-        <FontAwesomeIcon icon={icon} className={classes.linkIcon} />
-        {label}
+    <Link href={button.url} passHref>
+      <a
+        onClick={handleClick}
+        className={cx(
+          classes.link,
+          pathname === button.url && classes.linkActive
+        )}
+      >
+        <FontAwesomeIcon icon={button.icon} className={classes.linkIcon} />
+        {button.label}
       </a>
     </Link>
   );
