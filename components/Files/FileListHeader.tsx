@@ -111,5 +111,6 @@ const useStyles = createStyles((theme) => ({
     marginLeft: theme.spacing.sm,
     padding: '3px 0',
     overflow: 'hidden',
+    userSelect: 'none',
   },
 }));

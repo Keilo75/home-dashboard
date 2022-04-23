@@ -37,7 +37,9 @@ const FileListRow: React.FC<FileListRowProps> = ({
     <Group className={classes.fileListRow} spacing="xs">
       <Checkbox checked={file.selected} onChange={handleCheckboxChange} />
       <FileIcon type={file.isFolder ? 'folder' : file.extension} />
-      <Anchor onClick={handleAnchorClick}>{file.name}</Anchor>
+      <Anchor onClick={handleAnchorClick} className={classes.fileName}>
+        {file.name}
+      </Anchor>
     </Group>
   );
 };
@@ -54,5 +56,9 @@ const useStyles = createStyles((theme) => ({
           ? theme.colors.dark[5]
           : theme.colors.gray[1],
     },
+  },
+
+  fileName: {
+    userSelect: 'none',
   },
 }));
