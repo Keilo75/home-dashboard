@@ -135,7 +135,7 @@ const Files: NextPage = () => {
           <Overlay color="black" />
           <Center className={classes.creatingZIPCenter}>
             <Stack align="center">
-              <Text>
+              <Text color="white">
                 {creatingZIP === 'loading' ? 'Erstelle ZIP-Datei' : 'Fertig!'}
               </Text>
               {creatingZIP === 'loading' ? (
