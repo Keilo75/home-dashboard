@@ -1,9 +1,10 @@
 import {
   faDownload,
+  faPen,
   faTrashAlt,
   faUpload,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Button,
   Center,
@@ -17,17 +18,18 @@ import {
   Stack,
   Text,
   Title,
-} from '@mantine/core';
-import { useDisclosure, useListState } from '@mantine/hooks';
-import { showNotification } from '@mantine/notifications';
-import axios from 'axios';
-import FileListHeader from 'components/Files/FileListHeader';
-import FileListRow from 'components/Files/FileListRow';
-import FilePreviewModal from 'components/Files/FilePreviewModal';
-import FileUploadModal from 'components/Files/FileUploadModal';
-import { IFile, IFileItem } from 'models/files';
-import { NextPage } from 'next';
-import React, { useEffect, useRef, useState } from 'react';
+} from "@mantine/core";
+import { useDisclosure, useListState } from "@mantine/hooks";
+import { showNotification } from "@mantine/notifications";
+import axios from "axios";
+import FileListHeader from "components/Files/FileListHeader";
+import FileListRow from "components/Files/FileListRow";
+import FilePreviewModal from "components/Files/FilePreviewModal";
+import FileRenameModal from "components/Files/FileRenameModal";
+import FileUploadModal from "components/Files/FileUploadModal";
+import { IFile, IFileItem, isValidName as canNameBeUsed } from "models/files";
+import { NextPage } from "next";
+import React, { useEffect, useRef, useState } from "react";
 
 const Files: NextPage = () => {
   const { classes } = useStyles();
@@ -36,18 +38,19 @@ const Files: NextPage = () => {
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [files, filesHandler] = useListState<IFileItem>();
   const [isUploading, setIsUploading] = useState(false);
-  const [creatingZIP, setCreatingZIP] = useState<'loading' | 'finished'>();
+  const [creatingZIP, setCreatingZIP] = useState<"loading" | "finished">();
 
   const [fileUploadModalOpened, fileUploadModalHandler] = useDisclosure(false);
+  const [fileRenameModalOpened, fileRenameModalHandler] = useDisclosure(false);
   const [filePreviewModalOpened, filePreviewModalHandler] =
     useDisclosure(false);
-  const filePreviewModalFile = useRef<IFile>();
+  const currentFileItem = useRef<IFileItem>();
 
   useEffect(() => {
     setLoadingFiles(true);
 
     axios
-      .get<IFileItem[]>(`/api/files/list?path=${path.join('/')}`)
+      .get<IFileItem[]>(`/api/files/list?path=${path.join("/")}`)
       .then((res) => res.data)
       .then((res) => {
         filesHandler.setState(res);
@@ -65,8 +68,8 @@ const Files: NextPage = () => {
 
     try {
       const request = `/api/files/delete?path=${path.join(
-        '/'
-      )}${selectedFileNames.map((file) => `&file=${file}`).join('')}`;
+        "/"
+      )}${selectedFileNames.map((file) => `&file=${file}`).join("")}`;
       const response = await axios.delete<IFileItem[]>(request);
 
       filesHandler.setState(response.data);
@@ -74,15 +77,23 @@ const Files: NextPage = () => {
       console.error(err);
 
       showNotification({
-        title: 'Etwas ist schiefgelaufen...',
-        message: 'Die Datei(en) konnten nicht gelöscht werden',
-        color: 'red',
+        title: "Etwas ist schiefgelaufen...",
+        message: "Die Datei(en) konnten nicht gelöscht werden",
+        color: "red",
       });
     }
   };
 
+  const openFileRenameModal = () => {
+    const selectedFile = files.find((file) => file.selected);
+    if (!selectedFile) return;
+
+    currentFileItem.current = selectedFile;
+    fileRenameModalHandler.open();
+  };
+
   const openFilePreviewModal = (file: IFile) => {
-    filePreviewModalFile.current = file;
+    currentFileItem.current = file;
     filePreviewModalHandler.open();
   };
 
@@ -93,27 +104,27 @@ const Files: NextPage = () => {
 
     if (!needsZip) {
       window.open(
-        `/download?path=${path.join('/')}&file=${selectedFiles[0].name}&zip=0`
+        `/download?path=${path.join("/")}&file=${selectedFiles[0].name}&zip=0`
       );
 
       return;
     }
 
     try {
-      setCreatingZIP('loading');
+      setCreatingZIP("loading");
 
       await axios.post<string>(
-        `/zip?path=${path.join('/')}${files
+        `/zip?path=${path.join("/")}${files
           .filter((file) => file.selected)
           .map((file) => `&file=${file.name}`)
-          .join('')}`
+          .join("")}`
       );
-      setCreatingZIP('finished');
+      setCreatingZIP("finished");
     } catch {
       showNotification({
-        title: 'ZIP-Datei konnte nicht erstellt werden',
-        message: 'Maximale Größe ist 100MB',
-        color: 'red',
+        title: "ZIP-Datei konnte nicht erstellt werden",
+        message: "Maximale Größe ist 100MB",
+        color: "red",
       });
       setCreatingZIP(undefined);
     }
@@ -128,6 +139,11 @@ const Files: NextPage = () => {
     }, 10);
   };
 
+  const isValidName = (name: string): string | null => {
+    if (files.some((file) => file.name === name)) return "Existiert bereits";
+    return canNameBeUsed(name) ? "Ungültiger Name" : null;
+  };
+
   return (
     <>
       {creatingZIP !== undefined && (
@@ -136,9 +152,9 @@ const Files: NextPage = () => {
           <Center className={classes.creatingZIPCenter}>
             <Stack align="center">
               <Text color="white">
-                {creatingZIP === 'loading' ? 'Erstelle ZIP-Datei' : 'Fertig!'}
+                {creatingZIP === "loading" ? "Erstelle ZIP-Datei" : "Fertig!"}
               </Text>
-              {creatingZIP === 'loading' ? (
+              {creatingZIP === "loading" ? (
                 <>
                   <Loader />
                 </>
@@ -180,7 +196,16 @@ const Files: NextPage = () => {
                       leftIcon={<FontAwesomeIcon icon={faTrashAlt} />}
                       onClick={handleDelete}
                     >
-                      Lösche
+                      Löschen
+                    </Button>
+                    <Button
+                      leftIcon={<FontAwesomeIcon icon={faPen} />}
+                      onClick={openFileRenameModal}
+                      disabled={
+                        files.filter((file) => file.selected).length > 1
+                      }
+                    >
+                      Umbennen
                     </Button>
                   </>
                 ) : (
@@ -200,6 +225,7 @@ const Files: NextPage = () => {
                 setPath={setPath}
                 files={files}
                 filesHandler={filesHandler}
+                isValidName={isValidName}
               />
               {files.length > 0 ? (
                 files.map((file, index) => (
@@ -243,11 +269,27 @@ const Files: NextPage = () => {
         centered
         title="Vorschau"
       >
-        {filePreviewModalFile.current && (
+        {currentFileItem.current && !currentFileItem.current.isFolder && (
           <FilePreviewModal
             close={filePreviewModalHandler.close}
-            file={filePreviewModalFile.current}
+            file={currentFileItem.current}
             path={path}
+          />
+        )}
+      </Modal>
+      <Modal
+        opened={fileRenameModalOpened}
+        onClose={fileRenameModalHandler.close}
+        centered
+        title="Umbennen"
+      >
+        {currentFileItem.current && (
+          <FileRenameModal
+            close={fileRenameModalHandler.close}
+            file={currentFileItem.current}
+            path={path}
+            filesHandler={filesHandler}
+            isValidName={isValidName}
           />
         )}
       </Modal>
@@ -269,13 +311,13 @@ const useStyles = createStyles((theme) => ({
   fileList: {
     flexGrow: 1,
     flexBasis: 0,
-    overflowY: 'auto',
-    position: 'relative',
+    overflowY: "auto",
+    position: "relative",
   },
 
   creatingZIPCenter: {
     zIndex: 100000,
-    position: 'absolute',
+    position: "absolute",
     inset: 0,
   },
 }));
