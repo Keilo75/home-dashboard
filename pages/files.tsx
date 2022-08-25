@@ -39,7 +39,7 @@ const Files: NextPage = () => {
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [files, filesHandler] = useListState<IFileItem>();
   const [isUploading, setIsUploading] = useState(false);
-  const [creatingZIP, setCreatingZIP] = useState<"loading" | "finished">();
+  const [creatingZIP, setCreatingZIP] = useState(false);
 
   const [fileUploadModalOpened, fileUploadModalHandler] = useDisclosure(false);
   const [fileRenameModalOpened, fileRenameModalHandler] = useDisclosure(false);
@@ -90,32 +90,29 @@ const Files: NextPage = () => {
     }
 
     try {
-      setCreatingZIP("loading");
+      setCreatingZIP(true);
+
+      const zipName =
+        selectedFiles.length > 1 ? "Download" : selectedFiles[0].name;
 
       await axios.post<string>(
-        `/zip?path=${path.join("/")}${files
-          .filter((file) => file.selected)
+        `/zip?path=${path.join("/")}${selectedFiles
           .map((file) => `&file=${file.name}`)
           .join("")}`
       );
-      setCreatingZIP("finished");
+      setCreatingZIP(false);
+
+      window.open(`/download?path=..&file=download.zip&zip=1&name=${zipName}`);
     } catch {
       showNotification({
         title: "ZIP-Datei konnte nicht erstellt werden",
         message: "Maximale Größe ist 100MB",
         color: "red",
       });
-      setCreatingZIP(undefined);
+      setCreatingZIP(false);
     }
 
     return;
-  };
-
-  const handleZIPDownload = () => {
-    setCreatingZIP(undefined);
-    setTimeout(() => {
-      window.open(`/download?path=..&file=download.zip&zip=1`);
-    }, 10);
   };
 
   const isValidName = (name: string): string | null => {
@@ -125,27 +122,13 @@ const Files: NextPage = () => {
 
   return (
     <>
-      {creatingZIP !== undefined && (
+      {creatingZIP === true && (
         <>
           <Overlay color="black" />
           <Center className={classes.creatingZIPCenter}>
             <Stack align="center">
-              <Text color="white">
-                {creatingZIP === "loading" ? "Erstelle ZIP-Datei" : "Fertig!"}
-              </Text>
-              {creatingZIP === "loading" ? (
-                <>
-                  <Loader />
-                </>
-              ) : (
-                <Button
-                  color="teal"
-                  leftIcon={<FontAwesomeIcon icon={faDownload} />}
-                  onClick={handleZIPDownload}
-                >
-                  Download
-                </Button>
-              )}
+              <Text color="white">Erstelle ZIP-Datei</Text>
+              <Loader />
             </Stack>
           </Center>
         </>
