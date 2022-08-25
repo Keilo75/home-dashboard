@@ -92,8 +92,19 @@ const Files: NextPage = () => {
     try {
       setCreatingZIP(true);
 
-      const zipName =
-        selectedFiles.length > 1 ? "Download" : selectedFiles[0].name;
+      const fileCount = selectedFiles.filter((file) => !file.isFolder).length;
+      const folderCount = selectedFiles.length - fileCount;
+
+      let zipName = "";
+      if (selectedFiles.length === 1) {
+        zipName = selectedFiles[0].name;
+      } else {
+        const names = ["Ordner", "Datei(en)"];
+        zipName = [folderCount, fileCount]
+          .map((count, index) => `${count} ${names[index]}`)
+          .filter((name) => !name.startsWith("0"))
+          .join(", ");
+      }
 
       await axios.post<string>(
         `/zip?path=${path.join("/")}${selectedFiles
