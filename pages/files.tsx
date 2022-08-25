@@ -24,6 +24,7 @@ import { showNotification } from "@mantine/notifications";
 import axios from "axios";
 import FileListHeader from "components/Files/FileListHeader";
 import FileListRow from "components/Files/FileListRow";
+import FileDeleteModal from "components/Files/Modals/FileDeleteModal";
 import FilePreviewModal from "components/Files/Modals/FilePreviewModal";
 import FileRenameModal from "components/Files/Modals/FileRenameModal";
 import FileUploadModal from "components/Files/Modals/FileUploadModal";
@@ -42,6 +43,7 @@ const Files: NextPage = () => {
 
   const [fileUploadModalOpened, fileUploadModalHandler] = useDisclosure(false);
   const [fileRenameModalOpened, fileRenameModalHandler] = useDisclosure(false);
+  const [fileDeleteModalOpened, fileDeleteModalHandler] = useDisclosure(false);
   const [filePreviewModalOpened, filePreviewModalHandler] =
     useDisclosure(false);
   const currentFileItem = useRef<IFileItem>();
@@ -62,26 +64,11 @@ const Files: NextPage = () => {
   }, [path]);
 
   const handleDelete = async () => {
-    const selectedFileNames = files
-      .filter((file) => file.selected)
-      .map((file) => file.name);
+    const selectedFile = files.find((file) => file.selected);
+    if (!selectedFile) return;
 
-    try {
-      const request = `/api/files/delete?path=${path.join(
-        "/"
-      )}${selectedFileNames.map((file) => `&file=${file}`).join("")}`;
-      const response = await axios.delete<IFileItem[]>(request);
-
-      filesHandler.setState(response.data);
-    } catch (err) {
-      console.error(err);
-
-      showNotification({
-        title: "Etwas ist schiefgelaufen...",
-        message: "Die Datei(en) konnten nicht gelöscht werden",
-        color: "red",
-      });
-    }
+    currentFileItem.current = selectedFile;
+    fileDeleteModalHandler.open();
   };
 
   const openFileRenameModal = () => {
@@ -291,6 +278,21 @@ const Files: NextPage = () => {
             path={path}
             filesHandler={filesHandler}
             isValidName={isValidName}
+          />
+        )}
+      </Modal>
+      <Modal
+        opened={fileDeleteModalOpened}
+        onClose={fileDeleteModalHandler.close}
+        centered
+        title="Löschen"
+      >
+        {currentFileItem.current && (
+          <FileDeleteModal
+            close={fileDeleteModalHandler.close}
+            path={path}
+            filesHandler={filesHandler}
+            files={files}
           />
         )}
       </Modal>
