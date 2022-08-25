@@ -1,13 +1,13 @@
 import { Button, Group, Text } from "@mantine/core";
 import React from "react";
 import { IFileItem } from "models/files";
-import { UseListStateHandler } from "@mantine/hooks/lib/use-list-state/use-list-state";
 import axios from "axios";
 import { showNotification } from "@mantine/notifications";
+import { UseListStateHandlers } from "@mantine/hooks/lib/use-list-state/use-list-state";
 
 interface FileDeleteModal {
   close: () => void;
-  filesHandler: UseListStateHandler<IFileItem>;
+  filesHandler: UseListStateHandlers<IFileItem>;
   path: string[];
   files: IFileItem[];
 }

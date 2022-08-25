@@ -1,8 +1,15 @@
 import {
+  faEllipsis,
+  faEllipsisVertical,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  ActionIcon,
   Button,
   Center,
   createStyles,
   Group,
+  Menu,
   Paper,
   Text,
 } from "@mantine/core";
@@ -75,6 +82,9 @@ const FilePreviewModal: React.FC<FileUploadModalProps> = ({
         <Button onClick={handleDownload} color="teal">
           Download
         </Button>
+        <ActionIcon>
+          <FontAwesomeIcon icon={faEllipsisVertical} />{" "}
+        </ActionIcon>
       </Group>
     </>
   );

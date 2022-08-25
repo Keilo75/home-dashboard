@@ -1,11 +1,10 @@
 import { Button, Group, TextInput } from "@mantine/core";
-import { useForm, formList } from "@mantine/form";
+import { useForm } from "@mantine/form";
 import React from "react";
-import { v4 as uuid } from "uuid";
 import { IFileItem } from "models/files";
 import axios from "axios";
 import { showNotification } from "@mantine/notifications";
-import { UseListStateHandler } from "@mantine/hooks/lib/use-list-state/use-list-state";
+import { UseListStateHandlers } from "@mantine/hooks/lib/use-list-state/use-list-state";
 
 interface Form {
   name: string;
@@ -13,7 +12,7 @@ interface Form {
 
 interface FileUploadModalProps {
   close: () => void;
-  filesHandler: UseListStateHandler<IFileItem>;
+  filesHandler: UseListStateHandlers<IFileItem>;
   path: string[];
   isValidName: (name: string) => string | null;
 }

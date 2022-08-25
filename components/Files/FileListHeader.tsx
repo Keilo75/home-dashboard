@@ -13,7 +13,7 @@ import {
   Modal,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { UseListStateHandler } from "@mantine/hooks/lib/use-list-state/use-list-state";
+import { UseListStateHandlers } from "@mantine/hooks/lib/use-list-state/use-list-state";
 import { IFileItem } from "models/files";
 import React from "react";
 import NewFolderModal from "./Modals/NewFolderModal";
@@ -23,7 +23,7 @@ interface FileListHeaderProps {
   setPath: React.Dispatch<React.SetStateAction<string[]>>;
   isValidName: (name: string) => string | null;
   files: IFileItem[];
-  filesHandler: UseListStateHandler<IFileItem>;
+  filesHandler: UseListStateHandlers<IFileItem>;
 }
 
 const FileListHeader: React.FC<FileListHeaderProps> = ({

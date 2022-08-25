@@ -1,9 +1,7 @@
 import { Button, Group, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { UseListStateHandler } from "@mantine/hooks/lib/use-list-state/use-list-state";
-import { showNotification } from "@mantine/notifications";
+import { UseListStateHandlers } from "@mantine/hooks/lib/use-list-state/use-list-state";
 import axios from "axios";
-import { files } from "jszip";
 import { IFileItem } from "models/files";
 import React from "react";
 
@@ -15,7 +13,7 @@ interface FileRenameModalProps {
   close: () => void;
   file: IFileItem;
   path: string[];
-  filesHandler: UseListStateHandler<IFileItem>;
+  filesHandler: UseListStateHandlers<IFileItem>;
   isValidName: (name: string) => string | null;
 }
 

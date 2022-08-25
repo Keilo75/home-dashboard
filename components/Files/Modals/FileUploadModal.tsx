@@ -2,8 +2,8 @@ import {
   faRotateLeft,
   faTrashAlt,
   faUpload,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   ActionIcon,
   Button,
@@ -17,21 +17,20 @@ import {
   Switch,
   Text,
   TextInput,
-} from '@mantine/core';
-import { Dropzone } from '@mantine/dropzone';
-import { useListState } from '@mantine/hooks';
-import { useForm, formList } from '@mantine/form';
-import React, { useState } from 'react';
-import { v4 as uuid } from 'uuid';
-import { FormList } from '@mantine/form/lib/form-list/form-list';
-import prettyBytes from 'pretty-bytes';
-import { IFileItem, isValidName } from 'models/files';
-import axios from 'axios';
-import { showNotification } from '@mantine/notifications';
-import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
+} from "@mantine/core";
+import { Dropzone } from "@mantine/dropzone";
+import { useListState } from "@mantine/hooks";
+import { useForm } from "@mantine/form";
+import React, { useState } from "react";
+import { v4 as uuid } from "uuid";
+import prettyBytes from "pretty-bytes";
+import { IFileItem, isValidName } from "models/files";
+import axios from "axios";
+import { showNotification } from "@mantine/notifications";
+import { UseListStateHandlers } from "@mantine/hooks/lib/use-list-state/use-list-state";
 
 interface Form {
-  files: FormList<{ name: string; id: string }>;
+  files: { name: string; id: string }[];
   createFolder: boolean;
   folderName: string;
 }
@@ -39,7 +38,7 @@ interface Form {
 interface FileUploadModalProps {
   close: () => void;
   files: IFileItem[];
-  filesHandler: UseListStateHandler<IFileItem>;
+  filesHandler: UseListStateHandlers<IFileItem>;
   path: string[];
   isUploading: boolean;
   setIsUploading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -59,38 +58,35 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const form = useForm<Form>({
-    initialValues: { files: formList([]), createFolder: false, folderName: '' },
+    initialValues: { files: [], createFolder: false, folderName: "" },
     validate: {
       files: {
         name: (value) => {
           if (
             form.values.files.filter((file) => file.name === value).length > 1
           )
-            return 'Doppelter Name';
+            return "Doppelter Name";
           if (files.some((file) => file.name === value))
-            return 'Datei existiert bereits';
-          return isValidName(value) ? 'Ungültiger Name' : null;
+            return "Datei existiert bereits";
+          return isValidName(value) ? "Ungültiger Name" : null;
         },
       },
 
       folderName: (value) => {
         if (!form.values.createFolder) return null;
         if (files.some((file) => file.name === value))
-          return 'Ordner existiert bereits';
-        return isValidName(value) ? 'Ungültiger Name' : null;
+          return "Ordner existiert bereits";
+        return isValidName(value) ? "Ungültiger Name" : null;
       },
     },
   });
 
   const handleFilesDrop = (files: File[]) => {
     uploadedFilesHandler.append(...files);
-    form.setFieldValue(
-      'files',
-      formList([
-        ...form.values.files,
-        ...files.map((file) => ({ name: file.name, id: uuid() })),
-      ])
-    );
+    form.setFieldValue("files", [
+      ...form.values.files,
+      ...files.map((file) => ({ name: file.name, id: uuid() })),
+    ]);
   };
 
   const handleSubmit = async (values: Form) => {
@@ -104,7 +100,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
 
     try {
       const response = await axios.post<IFileItem[]>(
-        `/api/files/upload?path=${path.join('/')}&folder=${
+        `/api/files/upload?path=${path.join("/")}&folder=${
           form.values.folderName
         }`,
         formData,
@@ -118,16 +114,16 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
       filesHandler.setState(response.data);
 
       showNotification({
-        message: 'Datei(en) erfolgreich hochgeladen',
-        color: 'green',
+        message: "Datei(en) erfolgreich hochgeladen",
+        color: "green",
       });
     } catch (err) {
       console.error(err);
 
       showNotification({
-        title: 'Etwas ist schiefgelaufen...',
-        message: 'Deine Datei(en) konnten nicht hochgeladen werden',
-        color: 'red',
+        title: "Etwas ist schiefgelaufen...",
+        message: "Deine Datei(en) konnten nicht hochgeladen werden",
+        color: "red",
       });
     }
 
@@ -145,14 +141,12 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
       ) : (
         <>
           <Dropzone onDrop={handleFilesDrop} mb="sm">
-            {() => (
-              <Group position="apart" noWrap>
-                <FontAwesomeIcon icon={faUpload} size="lg" />
-                <Text>
-                  Ziehe Dateien hierher oder klicke, um sie auszuwählen.
-                </Text>
-              </Group>
-            )}
+            <Group position="apart" noWrap>
+              <FontAwesomeIcon icon={faUpload} size="lg" />
+              <Text>
+                Ziehe Dateien hierher oder klicke, um sie auszuwählen.
+              </Text>
+            </Group>
           </Dropzone>
 
           <Stack className={classes.fileList} p="sm" spacing="xs">
@@ -160,11 +154,11 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
               form.values.files.map((file, index) => {
                 const handleFileRemove = () => {
                   uploadedFilesHandler.remove(index);
-                  form.removeListItem('files', index);
+                  form.removeListItem("files", index);
                 };
 
                 const handleFileNameReset = () => {
-                  form.setListItem('files', index, {
+                  form.setFieldValue(`files.${index}`, {
                     name: uploadedFiles[index].name,
                     id: uuid(),
                   });
@@ -176,19 +170,14 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                       placeholder="Name"
                       className={classes.nameInput}
                       required
-                      {...form.getListInputProps('files', index, 'name')}
+                      {...form.getInputProps(`files.${index}.name`)}
                       rightSection={
                         <ActionIcon onClick={handleFileNameReset}>
                           <FontAwesomeIcon icon={faRotateLeft} size="xs" />
                         </ActionIcon>
                       }
                     />
-                    <ActionIcon
-                      color="red"
-                      variant="hover"
-                      onClick={handleFileRemove}
-                      mt={3}
-                    >
+                    <ActionIcon color="red" onClick={handleFileRemove} mt={3}>
                       <FontAwesomeIcon icon={faTrashAlt} size="xs" />
                     </ActionIcon>
                   </Group>
@@ -199,7 +188,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             )}
           </Stack>
           <Text color="dimmed">
-            {form.values.files.length} Datei(en) |{' '}
+            {form.values.files.length} Datei(en) |{" "}
             {prettyBytes(uploadedFiles.reduce((acc, cur) => acc + cur.size, 0))}
           </Text>
 
@@ -208,14 +197,14 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
               <Divider my="sm" />
               <Switch
                 label="Unterordner in dem momentanen Ordner erstellen?"
-                {...form.getInputProps('createFolder', { type: 'checkbox' })}
+                {...form.getInputProps("createFolder", { type: "checkbox" })}
                 mb="xs"
               />
               {form.values.createFolder && (
                 <TextInput
                   required
                   label="Ordnername"
-                  {...form.getInputProps('folderName')}
+                  {...form.getInputProps("folderName")}
                 />
               )}
             </>
@@ -240,9 +229,9 @@ export default FileUploadModal;
 const useStyles = createStyles((theme) => ({
   fileList: {
     maxHeight: 200,
-    overflowY: 'auto',
+    overflowY: "auto",
     backgroundColor:
-      theme.colorScheme === 'dark'
+      theme.colorScheme === "dark"
         ? theme.colors.gray[9]
         : theme.colors.gray[1],
   },
