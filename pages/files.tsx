@@ -63,14 +63,6 @@ const Files: NextPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
 
-  const handleDelete = async () => {
-    const selectedFile = files.find((file) => file.selected);
-    if (!selectedFile) return;
-
-    currentFileItem.current = selectedFile;
-    fileDeleteModalHandler.open();
-  };
-
   const openFileRenameModal = () => {
     const selectedFile = files.find((file) => file.selected);
     if (!selectedFile) return;
@@ -181,7 +173,7 @@ const Files: NextPage = () => {
                     <Button
                       color="red"
                       leftIcon={<FontAwesomeIcon icon={faTrashAlt} />}
-                      onClick={handleDelete}
+                      onClick={fileDeleteModalHandler.open}
                     >
                       Löschen
                     </Button>

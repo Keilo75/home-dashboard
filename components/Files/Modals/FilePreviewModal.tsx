@@ -1,6 +1,7 @@
 import {
-  faEllipsis,
+  faDownload,
   faEllipsisVertical,
+  faPen,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -78,13 +79,28 @@ const FilePreviewModal: React.FC<FileUploadModalProps> = ({
         <Button variant="default" onClick={close}>
           Zurück
         </Button>
-        <Button onClick={handleFileRename}>Umbennen</Button>
-        <Button onClick={handleDownload} color="teal">
-          Download
-        </Button>
-        <ActionIcon>
-          <FontAwesomeIcon icon={faEllipsisVertical} />{" "}
-        </ActionIcon>
+
+        <Menu width={150}>
+          <Menu.Target>
+            <ActionIcon>
+              <FontAwesomeIcon icon={faEllipsisVertical} />{" "}
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item
+              onClick={handleDownload}
+              icon={<FontAwesomeIcon icon={faDownload} />}
+            >
+              Download
+            </Menu.Item>
+            <Menu.Item
+              onClick={handleFileRename}
+              icon={<FontAwesomeIcon icon={faPen} />}
+            >
+              Umbennen
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       </Group>
     </>
   );
