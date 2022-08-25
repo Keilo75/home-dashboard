@@ -274,6 +274,7 @@ const Files: NextPage = () => {
             close={filePreviewModalHandler.close}
             file={currentFileItem.current}
             path={path}
+            openFileRenameModal={fileRenameModalHandler.open}
           />
         )}
       </Modal>

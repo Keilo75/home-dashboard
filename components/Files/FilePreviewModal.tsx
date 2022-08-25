@@ -1,5 +1,4 @@
 import {
-  Anchor,
   Button,
   Center,
   createStyles,
@@ -7,21 +6,22 @@ import {
   Paper,
   Text,
 } from "@mantine/core";
-import axios from "axios";
 import { IFile, isExtensionPreviewable } from "models/files";
 import prettyBytes from "pretty-bytes";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 
 interface FileUploadModalProps {
   close: () => void;
   file: IFile;
   path: string[];
+  openFileRenameModal: () => void;
 }
 
 const FilePreviewModal: React.FC<FileUploadModalProps> = ({
   close,
   file,
   path,
+  openFileRenameModal,
 }) => {
   const { classes } = useStyles();
   const date = useMemo(
@@ -39,6 +39,11 @@ const FilePreviewModal: React.FC<FileUploadModalProps> = ({
 
   const handleDownload = () => {
     window.open(`/download?path=${path.join("/")}&file=${file.name}&zip=0`);
+  };
+
+  const handleFileRename = () => {
+    close();
+    openFileRenameModal();
   };
 
   return (
@@ -66,6 +71,7 @@ const FilePreviewModal: React.FC<FileUploadModalProps> = ({
         <Button variant="default" onClick={close}>
           Zurück
         </Button>
+        <Button onClick={handleFileRename}>Umbennen</Button>
         <Button onClick={handleDownload} color="teal">
           Download
         </Button>
