@@ -16,7 +16,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { UseListStateHandler } from "@mantine/hooks/lib/use-list-state/use-list-state";
 import { IFileItem } from "models/files";
 import React from "react";
-import NewFolderModal from "./NewFolderModal";
+import NewFolderModal from "./Modals/NewFolderModal";
 
 interface FileListHeaderProps {
   path: string[];
