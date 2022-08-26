@@ -25,6 +25,7 @@ export default Changelog;
 const changelogData: Record<string, string[]> = {
   "1.0": ["Ursprünglicher Release"],
   "1.1": [
+    "+ Texte: Speichere & teile kurze Texte, wie z. B. Links",
     "+ Changelog",
     "+ Umbennenen von Dateien",
     "+ Erlaube Downloaden, Umbennenen und Löschen aus der Vorschau",

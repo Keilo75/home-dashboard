@@ -62,6 +62,8 @@ const Snippets: NextPage<SnippetsProps> = ({ serverSnippets }) => {
   const [snippets, snippetsHandler] = useListState<Snippet>(serverSnippets);
   const [loading, setLoading] = useState(false);
 
+  const [copiedSnippet, setCopiedSnippet] = useState<number>(0);
+
   useDidUpdate(() => {
     setLoading(true);
 
@@ -89,7 +91,9 @@ const Snippets: NextPage<SnippetsProps> = ({ serverSnippets }) => {
     const index = e.currentTarget.getAttribute("data-index");
     if (!index) return;
 
-    clipboard.copy(snippets[parseInt(index)].text);
+    const snippet = snippets[parseInt(index)];
+    clipboard.copy(snippet.text);
+    setCopiedSnippet(snippet.createdAt);
   };
 
   return (
@@ -131,7 +135,13 @@ const Snippets: NextPage<SnippetsProps> = ({ serverSnippets }) => {
               </Linkify>
               <div className={classes.snippetActions}>
                 <Tooltip label="Kopieren" withinPortal>
-                  <ActionIcon onClick={handleCopy} data-index={index}>
+                  <ActionIcon
+                    onClick={handleCopy}
+                    data-index={index}
+                    color={
+                      copiedSnippet === snippet.createdAt ? "green" : "gray"
+                    }
+                  >
                     <FontAwesomeIcon icon={faClipboard} />
                   </ActionIcon>
                 </Tooltip>
