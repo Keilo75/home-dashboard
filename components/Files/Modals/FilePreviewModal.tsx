@@ -2,6 +2,7 @@ import {
   faDownload,
   faEllipsisVertical,
   faPen,
+  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -23,6 +24,7 @@ interface FileUploadModalProps {
   file: IFile;
   path: string[];
   openFileRenameModal: () => void;
+  openFileDeleteModal: () => void;
 }
 
 const FilePreviewModal: React.FC<FileUploadModalProps> = ({
@@ -30,6 +32,7 @@ const FilePreviewModal: React.FC<FileUploadModalProps> = ({
   file,
   path,
   openFileRenameModal,
+  openFileDeleteModal,
 }) => {
   const { classes } = useStyles();
   const date = useMemo(
@@ -52,6 +55,11 @@ const FilePreviewModal: React.FC<FileUploadModalProps> = ({
   const handleFileRename = () => {
     close();
     openFileRenameModal();
+  };
+
+  const handleFileDelete = () => {
+    close();
+    openFileDeleteModal();
   };
 
   return (
@@ -98,6 +106,14 @@ const FilePreviewModal: React.FC<FileUploadModalProps> = ({
               icon={<FontAwesomeIcon icon={faPen} />}
             >
               Umbennen
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item
+              onClick={handleFileDelete}
+              icon={<FontAwesomeIcon icon={faTrashAlt} />}
+              color="red"
+            >
+              Löschen
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>

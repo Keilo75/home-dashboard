@@ -1,4 +1,4 @@
-import { Button, Group, Text } from "@mantine/core";
+import { Button, Group, List, Text } from "@mantine/core";
 import React from "react";
 import { IFileItem } from "models/files";
 import axios from "axios";
@@ -10,6 +10,7 @@ interface FileDeleteModal {
   filesHandler: UseListStateHandlers<IFileItem>;
   path: string[];
   files: IFileItem[];
+  fileToDelete?: IFileItem;
 }
 
 const FileDeleteModal: React.FC<FileDeleteModal> = ({
@@ -17,16 +18,19 @@ const FileDeleteModal: React.FC<FileDeleteModal> = ({
   path,
   filesHandler,
   files,
+  fileToDelete,
 }) => {
-  const handleDelete = async () => {
-    const selectedFileNames = files
-      .filter((file) => file.selected)
-      .map((file) => file.name);
+  const fileNames = (
+    fileToDelete !== undefined
+      ? [fileToDelete]
+      : files.filter((file) => file.selected)
+  ).map((file) => file.name);
 
+  const handleDelete = async () => {
     try {
-      const request = `/api/files/delete?path=${path.join(
-        "/"
-      )}${selectedFileNames.map((file) => `&file=${file}`).join("")}`;
+      const request = `/api/files/delete?path=${path.join("/")}${fileNames
+        .map((file) => `&file=${file}`)
+        .join("")}`;
       const response = await axios.delete<IFileItem[]>(request);
 
       filesHandler.setState(response.data);
@@ -45,7 +49,15 @@ const FileDeleteModal: React.FC<FileDeleteModal> = ({
 
   return (
     <>
-      <Text>Bist du sicher? Dies kann nicht rückgangig gemacht werden.</Text>
+      <Text>
+        Bist du sicher, dass du die folgende(n) Datei(en) löschen willst? Dies
+        kann nicht rückgangig gemacht werden.
+      </Text>
+      <List>
+        {fileNames.map((fileName, index) => (
+          <List.Item key={index}>{fileName}</List.Item>
+        ))}
+      </List>
       <Group position="right" spacing="xs" mt="sm">
         <Button variant="default" onClick={close}>
           Zurück

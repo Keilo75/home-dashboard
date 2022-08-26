@@ -1,5 +1,5 @@
-import { Title } from '@mantine/core';
-import { NextPage } from 'next';
+import { Title } from "@mantine/core";
+import { NextPage } from "next";
 
 const Home: NextPage = () => {
   return (
@@ -10,3 +10,10 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+/*
+TODO:
+- Add path to url to enable going backwards
+- Drag and drop files
+- Share links / text
+*/

@@ -131,6 +131,11 @@ const Files: NextPage = () => {
     return canNameBeUsed(name) ? "Ungültiger Name" : null;
   };
 
+  const handleFileDeleteModalOpen = () => {
+    currentFileItem.current = undefined;
+    fileDeleteModalHandler.open();
+  };
+
   return (
     <>
       {creatingZIP === true && (
@@ -167,7 +172,7 @@ const Files: NextPage = () => {
                     <Button
                       color="red"
                       leftIcon={<FontAwesomeIcon icon={faTrashAlt} />}
-                      onClick={fileDeleteModalHandler.open}
+                      onClick={handleFileDeleteModalOpen}
                     >
                       Löschen
                     </Button>
@@ -248,6 +253,7 @@ const Files: NextPage = () => {
             file={currentFileItem.current}
             path={path}
             openFileRenameModal={fileRenameModalHandler.open}
+            openFileDeleteModal={fileDeleteModalHandler.open}
           />
         )}
       </Modal>
@@ -273,14 +279,13 @@ const Files: NextPage = () => {
         centered
         title="Löschen"
       >
-        {currentFileItem.current && (
-          <FileDeleteModal
-            close={fileDeleteModalHandler.close}
-            path={path}
-            filesHandler={filesHandler}
-            files={files}
-          />
-        )}
+        <FileDeleteModal
+          close={fileDeleteModalHandler.close}
+          path={path}
+          filesHandler={filesHandler}
+          files={files}
+          fileToDelete={currentFileItem.current}
+        />
       </Modal>
     </>
   );
