@@ -1,4 +1,8 @@
-import { faPaperPlane, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import {
+  faClipboard,
+  faPaperPlane,
+  faTrashAlt,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   ActionIcon,
@@ -15,7 +19,12 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
-import { useDidUpdate, useInputState, useListState } from "@mantine/hooks";
+import {
+  useClipboard,
+  useDidUpdate,
+  useInputState,
+  useListState,
+} from "@mantine/hooks";
 import axios from "axios";
 import { readJSON, writeJSON } from "fs-extra";
 import Linkify from "linkify-react";
@@ -45,6 +54,8 @@ export const getServerSideProps: GetServerSideProps<
 };
 
 const Snippets: NextPage<SnippetsProps> = ({ serverSnippets }) => {
+  const clipboard = useClipboard({ timeout: 500 });
+
   const { classes } = useStyles();
   const [userText, setUserText] = useInputState("");
 
@@ -72,6 +83,13 @@ const Snippets: NextPage<SnippetsProps> = ({ serverSnippets }) => {
     if (!index) return;
 
     snippetsHandler.remove(parseInt(index));
+  };
+
+  const handleCopy = (e: React.MouseEvent) => {
+    const index = e.currentTarget.getAttribute("data-index");
+    if (!index) return;
+
+    clipboard.copy(snippets[parseInt(index)].text);
   };
 
   return (
@@ -111,11 +129,18 @@ const Snippets: NextPage<SnippetsProps> = ({ serverSnippets }) => {
               >
                 {snippet.text}
               </Linkify>
-              <Tooltip label="Löschen" withinPortal>
-                <ActionIcon onClick={handleDelete} data-index={index}>
-                  <FontAwesomeIcon icon={faTrashAlt} />
-                </ActionIcon>
-              </Tooltip>
+              <div className={classes.snippetActions}>
+                <Tooltip label="Kopieren" withinPortal>
+                  <ActionIcon onClick={handleCopy} data-index={index}>
+                    <FontAwesomeIcon icon={faClipboard} />
+                  </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Löschen" withinPortal>
+                  <ActionIcon onClick={handleDelete} data-index={index}>
+                    <FontAwesomeIcon icon={faTrashAlt} />
+                  </ActionIcon>
+                </Tooltip>
+              </div>
             </Card>
           ))}
         </Stack>
@@ -146,6 +171,11 @@ const useStyles = createStyles((theme) => ({
 
   snippetText: {
     flexGrow: 1,
+  },
+
+  snippetActions: {
+    display: "flex",
+    flexDirection: "row",
   },
 }));
 
