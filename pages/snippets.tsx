@@ -7,22 +7,56 @@ import {
   createStyles,
   Divider,
   Input,
+  LoadingOverlay,
   Stack,
   Text,
   TextInput,
   Title,
   Tooltip,
 } from "@mantine/core";
-import { useInputState, useListState } from "@mantine/hooks";
+import { useDidUpdate, useInputState, useListState } from "@mantine/hooks";
+import axios from "axios";
+import { readJSON, writeJSON } from "fs-extra";
+import { snippetsPath } from "models/paths";
 import { Snippet } from "models/snippets";
-import { NextPage } from "next";
-import React, { useMemo } from "react";
+import { GetServerSideProps, NextPage } from "next";
+import React, { useEffect, useState } from "react";
 
-const Snippets: NextPage = () => {
+interface SnippetsProps {
+  serverSnippets: Snippet[];
+}
+
+export const getServerSideProps: GetServerSideProps<
+  SnippetsProps
+> = async () => {
+  let serverSnippets: Snippet[] = [];
+
+  try {
+    const data = await readJSON(snippetsPath);
+    serverSnippets = data;
+  } catch {
+    await writeJSON(snippetsPath, []);
+    serverSnippets = [];
+  }
+
+  return { props: { serverSnippets } };
+};
+
+const Snippets: NextPage<SnippetsProps> = ({ serverSnippets }) => {
   const { classes } = useStyles();
   const [userText, setUserText] = useInputState("");
 
-  const [snippets, snippetsHandler] = useListState<Snippet>([]);
+  const [snippets, snippetsHandler] = useListState<Snippet>(serverSnippets);
+  const [loading, setLoading] = useState(false);
+
+  useDidUpdate(() => {
+    setLoading(true);
+
+    axios
+      .post("/api/snippets/update", snippets)
+      .then(() => setLoading(false))
+      .catch(() => setLoading(false));
+  }, [snippets]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -41,6 +75,7 @@ const Snippets: NextPage = () => {
   return (
     <>
       <Title order={3}>Texte</Title>
+      <LoadingOverlay visible={loading} />
       <form className={classes.form} onSubmit={handleSubmit}>
         <TextInput
           className={classes.formInput}
