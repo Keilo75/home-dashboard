@@ -10,6 +10,7 @@ import {
   LoadingOverlay,
   Stack,
   Text,
+  Textarea,
   TextInput,
   Title,
   Tooltip,
@@ -17,10 +18,11 @@ import {
 import { useDidUpdate, useInputState, useListState } from "@mantine/hooks";
 import axios from "axios";
 import { readJSON, writeJSON } from "fs-extra";
+import Linkify from "linkify-react";
 import { snippetsPath } from "models/paths";
 import { Snippet } from "models/snippets";
 import { GetServerSideProps, NextPage } from "next";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 interface SnippetsProps {
   serverSnippets: Snippet[];
@@ -104,7 +106,11 @@ const Snippets: NextPage<SnippetsProps> = ({ serverSnippets }) => {
               withBorder
               className={classes.snippet}
             >
-              <div className={classes.snippetText}>{snippet.text}</div>
+              <Linkify
+                options={{ className: classes.snippetText, target: "_blank" }}
+              >
+                {snippet.text}
+              </Linkify>
               <Tooltip label="Löschen" withinPortal>
                 <ActionIcon onClick={handleDelete} data-index={index}>
                   <FontAwesomeIcon icon={faTrashAlt} />
