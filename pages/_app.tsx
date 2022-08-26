@@ -20,12 +20,17 @@ import {
 import ThemeToggle from "components/ThemeToggle/ThemeToggle";
 import Image from "next/image";
 import NavButton, { INavButton } from "components/NavButton/NavButton";
-import { faHome, faServer } from "@fortawesome/free-solid-svg-icons";
+import {
+  faClockRotateLeft,
+  faHome,
+  faServer,
+} from "@fortawesome/free-solid-svg-icons";
 import { NotificationsProvider } from "@mantine/notifications";
 
 const navigationLinks: INavButton[] = [
   { label: "Home", icon: faHome, url: "/" },
   { label: "Dateien", icon: faServer, url: "/files" },
+  { label: "Changelog", icon: faClockRotateLeft, url: "/changelog" },
 ];
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
