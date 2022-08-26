@@ -23,6 +23,7 @@ import NavButton, { INavButton } from "components/NavButton/NavButton";
 import {
   faClockRotateLeft,
   faHome,
+  faLink,
   faServer,
 } from "@fortawesome/free-solid-svg-icons";
 import { NotificationsProvider } from "@mantine/notifications";
@@ -30,6 +31,7 @@ import { NotificationsProvider } from "@mantine/notifications";
 const navigationLinks: INavButton[] = [
   { label: "Home", icon: faHome, url: "/" },
   { label: "Dateien", icon: faServer, url: "/files" },
+  { label: "Texte", icon: faLink, url: "/snippets" },
   { label: "Changelog", icon: faClockRotateLeft, url: "/changelog" },
 ];
 
